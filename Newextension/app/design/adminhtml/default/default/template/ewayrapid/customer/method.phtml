@@ -1,0 +1,184 @@
+<?php if( !$this->isAjax() ): ?>
+<table id="tokenbase-edit-<?php echo $this->getCode(); ?>" class="form-edit" cellspacing="0">
+<?php endif; ?>
+	<tr>
+		<td id="<?php echo $this->getCode(); ?>-cards" class="address-list">
+			<?php echo $this->getChildHtml('admin.customer.ewayrapid.cards'); ?>
+		</td>
+		<td id="<?php echo $this->getCode(); ?>-form">
+			<?php echo $this->getChildHtml('admin.customer.ewayrapid.form'); ?>
+		</td>
+	</tr>
+<?php if( !$this->isAjax() ): ?>
+</table>
+<?php endif; ?>
+
+<?php if( !$this->isAjax() ): ?>
+	<script type="text/javascript">
+		var encryptKey = '<?php echo Mage::getSingleton('ewayrapid/config')->getEncryptionKey() ?>';
+		var accessCode = '';
+		var saveTokenResult = '';
+	//<![CDATA[
+		var <?php echo $this->getCode(); ?> = {
+			deleteCard: function( id ) {
+				if( confirm("<?php echo $this->__('Are you sure you want to delete this?'); ?>") ) {
+					Element.show('loading-mask');
+					new Ajax.Request("<?php echo $this->getUrl('*/ewayrapid_savedcard/delete', array('customer_id' => $this->getCustomer()->getId())); ?>", {
+						method: 'post',
+						parameters: "token_id="+id,
+						evalScripts: true,
+						onComplete: function(data) {
+							Element.hide('loading-mask');
+
+							try {
+								var json = data.responseText.evalJSON();
+							} catch(e) {}
+
+							if( typeof json != 'undefined' && json.success == false ) {
+								alert( json.message );
+							}
+							else {
+								$('token-'+id).hide();
+								<?php echo $this->getCode(); ?>.editCard(0);
+							}
+						}
+					});
+				}
+			},
+
+			editCard: function( id ) {
+				Element.show('loading-mask');
+				new Ajax.Request("<?php echo $this->getUrl('*/ewayrapid_savedcard/load', array('customer_id' => $this->getCustomer()->getId())); ?>", {
+					method: 'post',
+					parameters: "token_id="+id,
+					evalScripts: true,
+					onComplete: function(data) {
+						Element.hide('loading-mask');
+
+						try {
+							var json = data.responseText.evalJSON();
+						} catch(e) {}
+
+						if( typeof json != 'undefined' && json.success == false ) {
+							alert( json.message );
+						}
+						else {
+							$('<?php echo $this->getCode(); ?>-form').update( data.responseText );
+						}
+					}
+				});
+			},
+
+			saveCard: function(customertokenid) {
+				var form = $('edit_form');
+				form.writeAttribute('data-eway-encrypt-key', encryptKey);
+				if(!validateForm()){
+					return;
+				}
+				<?php if(Mage::getSingleton('ewayrapid/config')->isSecureFieldConnection()) :?>
+                    if(!secureForm.secureFormValidate()) return;
+                <?php endif; ?>
+				var ewayForm = new EwayForm();
+				var submitForm = ewayForm.encryptForm(form, true);
+
+				Element.show('loading-mask');
+				var url = '';
+				<?php if(Mage::helper('ewayrapid')->useIframeInBackend()): ?>
+					url = '<?php echo $this->getUrl('*/ewayrapid_savedcard/getAccessCode', array('customer_id' => $this->getCustomer()->getId())); ?>';
+				<?php else: ?>
+					url = '<?php echo $this->getUrl('*/ewayrapid_savedcard/save', array('customer_id' => $this->getCustomer()->getId())); ?>'
+				<?php endif; ?>
+
+				if(customertokenid){
+					url += 'TokenCustomerID/' + customertokenid;
+				}
+				new Ajax.Request(url, {
+					method: 'post',
+					parameters: Form.serialize(submitForm, true),
+					evalScripts: true,
+					onComplete: function(data) {
+						Element.hide('loading-mask');
+						try {
+							var json = data.responseText.evalJSON();
+						} catch(e) {}
+
+						if( typeof json != 'undefined' && json.success == false ) {
+							alert( json.message );
+						}
+						else {
+							<?php if(Mage::helper('ewayrapid')->useIframeInBackend()): ?>
+								var eWAYConfig = {
+									sharedPaymentUrl: json.SharedPaymentUrl
+								};
+								ewayReturnUrl = '<?php echo $this->getUrl('*/ewayrapid_savedcard/savetoken', array('customer_id' => $this->getCustomer()->getId())); ?>';
+							 	saveTokenResult = json;
+								Element.show('loading-mask');
+								eCrypt.showModalPayment(eWAYConfig, saveTokenCallBack);
+							<?php else: ?>
+								$('<?php echo $this->getCode(); ?>-cards').update(data.responseText);
+								<?php echo $this->getCode(); ?>.editCard(0);
+							<?php endif; ?>
+						}
+					}
+				});
+			}
+		}
+
+		function saveTokenCallBack (result, transactionID, errors) {
+			if (result == "Complete") {
+				var reqParams = {
+//					'ccType': '',
+//					'expYear': saveTokenResult.Customer.CardExpiryYear,
+					'token_id': $('token_id').value,
+//					'startMonth': saveTokenResult.Customer.CardStartMonth,
+//					'startYear': saveTokenResult.Customer.CardStartYear,
+//					'issueNumber': saveTokenResult.Customer.CardIssueNumber,
+					'AccessCode': saveTokenResult.AccessCode,
+					'street1': saveTokenResult.street1,
+					'street2': saveTokenResult.street2
+				};
+				new Ajax.Request(ewayReturnUrl, {
+					method: 'post',
+					parameters: reqParams,
+					evalScripts: true,
+					onComplete: function(data) {
+						Element.hide('loading-mask');
+						try {
+							var json = data.responseText.evalJSON();
+						} catch(e) {}
+
+						if( typeof json != 'undefined' && json.success == false ) {
+							alert( json.message );
+						}
+						else {
+							$('<?php echo $this->getCode(); ?>-cards').update( data.responseText );
+							<?php echo $this->getCode(); ?>.editCard(0);
+						}
+					}
+				});
+			} else if (result == "Error") {
+				alert("There was a problem completing the payment: " + errors);
+				Element.hide('loading-mask');
+			} else{
+				Element.hide('loading-mask');
+			}
+		}
+
+		function validateForm(){
+			$$('.save-card-validate').each(function(ele){
+				var eleValidate = ele.getAttribute('data-validate');
+				ele.addClassName(eleValidate);
+			});
+			$('ewayrapid_region_id') && $('ewayrapid_region_id').addClassName('required-entry').addClassName('validate-select');
+			var validator = new Validation('edit_form');
+            <?php if(Mage::getSingleton('ewayrapid/config')->isSecureFieldConnection()) :?>
+                var s = secureForm.secureFormValidate();
+                var f = validator.validate();
+                return s && f;
+            <?php else :?>
+                return validator.validate();
+            <?php endif; ?>
+		}
+	//]]!>
+	</script>
+<?php endif; ?>

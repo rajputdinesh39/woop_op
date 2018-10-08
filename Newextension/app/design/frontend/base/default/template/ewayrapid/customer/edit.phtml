@@ -1,0 +1,774 @@
+<?php
+$_token = $this->getCurrentToken();
+$_address = $this->getCustomerAddress();
+
+// Form Url
+$connectionType = Mage::getStoreConfig('payment/ewayrapid_general/connection_type');
+$formUrl = $this->getSaveUrl();
+$transparent = false;
+$iframe = false;
+$secureField = false;
+$submitFunction = '';
+switch ($connectionType) {
+    case Eway_Rapid31_Model_Config::CONNECTION_DIRECT:
+        echo '<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eCrypt.js"></script>';
+        break;
+    case Eway_Rapid31_Model_Config::CONNECTION_TRANSPARENT:
+        $transparent = true;
+        $submitFunction = 'beforeSubmit';
+        break;
+    case Eway_Rapid31_Model_Config::CONNECTION_SHARED_PAGE:
+        $formUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . '/ewayrapid/mycards/getAccessCode';
+        break;
+    case Eway_Rapid31_Model_Config::CONNECTION_RAPID_IFRAME:
+        $formUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . '/ewayrapid/mycards/getAccessCode';
+        $iframe = true;
+        $submitFunction = 'beforeSubmitIframe';
+        break;
+    case Eway_Rapid31_Model_Config::CONNECTION_SECURE_FIELDS:
+        $secureField = true;
+        echo '<script src="https://secure.ewaypayments.com/scripts/eWAY.min.js" data-init="false"></script>';
+        break;
+    default:
+        break;
+}
+?>
+<?php if ($this->getTitle()): ?>
+    <div class="page-title">
+        <h1><?php echo $this->getTitle() ?></h1>
+    </div>
+<?php endif; ?>
+<?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+<div class="tool-tip" id="payment-tool-tip" style="display:none;">
+    <div class="btn-close"><a href="#" id="payment-tool-tip-close"
+                              title="<?php echo $this->__('Close') ?>"><?php echo $this->__('Close') ?></a></div>
+    <div class="tool-tip-content"><img src="<?php echo $this->getSkinUrl('images/cvv.gif') ?>"
+                                       alt="<?php echo $this->__('Card Verification Number Visual Reference') ?>"
+                                       title="<?php echo $this->__('Card Verification Number Visual Reference') ?>"/>
+    </div>
+</div>
+<form action="<?php echo $formUrl ?>" method="post" id="form-validate">
+<input type="hidden" name="EWAY_ACCESSCODE" id="eway_accesscode"/>
+<?php
+if ($_token->getTokenId()) {
+    ?>
+    <input type="hidden" name="token_id" value="<?php echo $_token->getTokenId() ?>"/>
+    <input type="hidden" name="TokenCustomerID" value="<?php echo $_token->getToken() ?>"/>
+<?php } ?>
+
+<!-- Card info -->
+<?php
+if ($connectionType !== Eway_Rapid31_Model_Config::CONNECTION_SHARED_PAGE
+    && $connectionType !== Eway_Rapid31_Model_Config::CONNECTION_RAPID_IFRAME
+    && $connectionType !== Eway_Rapid31_Model_Config::CONNECTION_SECURE_FIELDS
+) {
+    ?>
+    <div class="fieldset">
+        <?php echo $this->getBlockHtml('formkey') ?>
+        <h2 class="legend"><?php echo $this->__('Credit Card Information') ?></h2>
+
+        <div class="sp-methods">
+            <ul class="form-list">
+                <li>
+                    <div class="input-box">
+                        <label for="ewayrapid_saved_cc_owner"
+                               class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
+                        <input type="text" title="<?php echo $this->__('Name on Card') ?>"
+                               class="input-text required-entry validate-length maximum-length-50"
+                               id="ewayrapid_saved_cc_owner"
+                               name="payment[cc_owner]" value="<?php echo $this->escapeHtml($_token->getOwner()) ?>"
+                               __maxlength="50" autocomplete="off"/>
+                    </div>
+                </li>
+                <li>
+                    <label for="ewayrapid_saved_cc_number"
+                           class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
+
+                    <div class="input-box help-disabled-cc">
+                        <input type="text" id="ewayrapid_saved_cc_number" data-eway-encrypt-name="payment[cc_number]"
+                               title="<?php echo $this->__('Credit Card Number') ?>"
+                               class="input-text <?php if (!$this->isEdit()): ?>validate-cc-number validate-cc-type-auto<?php endif; ?>"
+                               autocomplete="off" <?php if ($this->isEdit()): ?>value="<?php echo $_token->getCard() ?>"
+                               disabled="disabled" <?php endif; ?> pattern="\d*"/>
+                        <input type="hidden" id="ewayrapid_saved_cc_type" name="payment[cc_type]"
+                               value="<?php echo $_token->getType() ?>"/>
+                        <?php if ($this->isEdit()): ?>
+                            <input type="hidden" name="EWAY_CARDNUMBER" value="444433XXXXXX1111"/>
+                            <a href="#"><?php echo $this->__('Help') ?></a>
+                            <div class="tool-tip" id="cc-help-tool-tip" style="display:none;">
+                                <div class="btn-close">
+                                    <a href="#" id="cc-help-tool-tip-close"
+                                       title="<?php echo $this->__('Close') ?>"><?php echo $this->__('Close') ?></a>
+                                </div>
+                                <div class="tool-tip-content">To use a new credit card number, please add another card
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </li>
+
+                <li id="ewayrapid_saved_cc_type_exp_div">
+                    <label for="ewayrapid_saved_expiration"
+                           class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+
+                    <div class="input-box">
+                        <div class="v-fix">
+                            <select id="ewayrapid_saved_expiration" name="payment[cc_exp_month]"
+                                    class="month validate-cc-exp required-entry" autocomplete="off">
+                                <?php $_ccExpMonth = $_token->getExpMonth() ?>
+                                <?php foreach ($this->getCcMonths() as $k => $v): ?>
+                                    <option
+                                        value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="v-fix">
+                            <?php $_ccExpYear = $_token->getExpYear() ?>
+                            <select id="ewayrapid_saved_expiration_yr" name="payment[cc_exp_year]"
+                                    class="year required-entry" autocomplete="off">
+                                <?php foreach ($this->getCcYears() as $k => $v): ?>
+                                    <option
+                                        value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                    </div>
+                </li>
+
+                <?php
+                if ($transparent) {
+                    ?>
+                    <li class="value_from_date">
+                        <label for="ewayrapid_saved_start_month"
+                               class="required"><?php echo $this->__('Valid From Date') ?></label>
+
+                        <div class="input-box">
+                            <div class="v-fix">
+                                <select id="ewayrapid_saved_start_month" name="payment[cc_start_month]"
+                                        class="month" autocomplete="off">
+                                    <?php $_ccStartMonth = $_token->getStartMonth() ?>
+                                    <?php foreach ($this->getCcMonths() as $k => $v): ?>
+                                        <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccStartMonth): ?>
+                                            selected="selected"<?php endif ?>><?php echo $v ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="v-fix">
+                                <?php $_ccStartYear = $_token->getStartYear() ?>
+                                <select id="ewayrapid_saved_start_year" name="payment[cc_start_year]"
+                                        class="year" autocomplete="off">
+                                    <?php
+                                    $start_year = 0;
+                                    $inc = 0;
+                                    foreach ($this->getCcYears() as $k => $v) {
+                                        if ($inc == 1) {
+                                            $start_year = (int)$k;
+                                            break;
+                                        }
+                                        echo "<option value=''>Year</option>";
+                                        $inc++;
+                                    }
+
+                                    for ($i = 10; $i > 0; $i--) {
+                                        ?>
+                                        <option value="<?php echo $start_year - $i ?>"
+                                            <?php if (($start_year - $i) == $_ccStartYear) { ?>
+                                                selected="selected"<?php } ?>>
+                                            <?php echo $start_year - $i ?>
+                                        </option>
+                                    <?php
+                                    }
+
+                                    $inc = 0;
+                                    foreach ($this->getCcYears() as $k => $v):
+                                        $inc++;
+                                        if ($inc == 1) {
+                                            continue;
+                                        }
+                                        ?>
+                                        <option value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccStartYear): ?>
+                                            selected="selected"<?php endif ?>><?php echo $v ?></option>
+                                    <?php
+                                    endforeach;
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="input-box">
+                            <label for="ewayrapid_saved_issue_number">
+                                <?php echo $this->__('Issue Number') ?>
+                            </label>
+                            <input type="text" title="<?php echo $this->__('Issue Number') ?>"
+                                   class="input-text validate-length maximum-length-4"
+                                   id="ewayrapid_saved_issue_number"
+                                   name="payment[cc_issue_number]"
+                                   value="<?php echo $this->escapeHtml($_token->getIssueNumber()) ?>"
+                                   __maxlength="50" autocomplete="off"/>
+                        </div>
+                    </li>
+                <?php
+                }
+                ?>
+
+                <?php if ($this->hasVerification()): ?>
+                    <li id="ewayrapid_saved_cc_type_cvv_div">
+                        <label for="ewayrapid_saved_cc_cid"
+                               class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
+
+                        <div class="input-box">
+                            <div class="v-fix">
+                                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>"
+                                       class="input-text cvv required-entry validate-cc-cvn" id="ewayrapid_saved_cc_cid"
+                                       data-eway-encrypt-name="payment[cc_cid]" value="" autocomplete="off"
+                                       pattern="\d*"/>
+                            </div>
+                            <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+                        </div>
+                    </li>
+                <?php endif; ?>
+                <?php
+                $_defaultToken = Mage::helper('ewayrapid/customer')->getDefaultToken();
+                if (!$_token->getToken() || ($_defaultToken && $_defaultToken != $_token->getTokenId())): ?>
+                    <li>
+                        <div class="v-fix" style="padding-right: 5px;">
+                            <input type="checkbox" id="ewayrapid_saved_default" name="is_default"/>
+                        </div>
+                        <label for="ewayrapid_saved_default"><?php echo $this->__('Default Credit Card') ?></label>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        </div>
+    </div>
+<?php
+} else if($connectionType === Eway_Rapid31_Model_Config::CONNECTION_SECURE_FIELDS) { ?>
+    <div class="field-set">
+        <ul class="securefield-elements">
+            <li class="cc_owner">
+                <label class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
+                <div id="eway-secure-field-name" class="secure-form-input secure-form-name"></div>
+                <div id="eway-secure-field-name-error" class="secure-form-error" style="display: none"><?php echo $this->__('Invalid Name on Card') ?></div>
+            </li>
+            <li class="cc_number">
+                <label class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
+                <?php if ($this->isEdit()): ?>
+                    <div class="secure-form-input"><input id="eway-secure-field-card-edit-input" type="text" disabled="disabled" value="<?php echo $_token->getCard() ?>"></div>
+                    <div id="eway-secure-field-card" style="display: none;" class="secure-form-input secure-form-card"></div>
+                <?php else: ?>
+                    <div id="eway-secure-field-card" class="secure-form-input secure-form-card"></div>
+                <?php endif; ?>
+                <div id="eway-secure-field-card-error" class="secure-form-error"
+                     style="display: none"><?php echo $this->__('Invalid Card Number') ?></div>
+            </li>
+            <li class="cc_expiry">
+                <label class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+                <div id="eway-secure-field-expiry" class="secure-form-input secure-form-expiry"></div>
+                <div id="eway-secure-field-expiry-error" class="secure-form-error" style="display: none"><?php echo $this->__('Invalid Expiration Date') ?></div>
+            </li>
+        <?php if ($this->hasVerification()): ?>
+            <li class="cc_cvn">
+                <div id="eway-secure-field-cvn" class="secure-form-input secure-form-cvn"></div>
+                <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+                <div id="eway-secure-field-cvn-error" class="secure-form-error" style="display: none"><?php echo $this->__('Invalid Card Verification Number') ?></div>
+            </li>
+        <?php endif;?>
+            <input type="hidden" id="securefieldcode" name="payment[secured_card_data]" value="" />
+        <?php
+        $_defaultToken = Mage::helper('ewayrapid/customer')->getDefaultToken();
+        if (!$_token->getToken() || ($_defaultToken && $_defaultToken != $_token->getTokenId())): ?>
+            <li>
+                <div class="v-fix" style="padding-right: 5px;">
+                    <input type="checkbox" id="ewayrapid_saved_default" name="is_default"/>
+                </div>
+                <label for="ewayrapid_saved_default"><?php echo $this->__('Default Credit Card') ?></label>
+            </li>
+        <?php endif; ?>
+        </ul>
+        <input type="hidden" id="eway-public-api-key" value="<?php echo $this->getPublicApiKey() ?>">
+        <input type="hidden" id="eway-secure-form-mask-value" value="<?php echo $this->isMaskValues() ?>">
+        <input type="hidden" id="eway-secure-form-auto-complete" value="<?php echo $this->isAutoComplete() ?>">
+    </div>
+
+    <script type="text/javascript">
+//        document.observe("dom:ready", function () {
+            var secureForm = new EwaySecureForm(<?php echo $this->hasVerification() ? 'true' : 'false' ?>);
+            secureForm.setupSecureField();
+//        });
+    </script>
+<?php } else {
+    // Responsive shared page card data
+    // ....
+    $_defaultToken = Mage::helper('ewayrapid/customer')->getDefaultToken();
+    if (!$_token->getToken() || ($_defaultToken && $_defaultToken != $_token->getTokenId())): ?>
+        <ul>
+            <li>
+                <div class="v-fix" style="padding-right: 5px;">
+                    <input type="checkbox" id="ewayrapid_saved_default" name="is_default"/>
+                </div>
+                <label for="ewayrapid_saved_default"><?php echo $this->__('Default Credit Card') ?></label>
+            </li>
+        </ul>
+    <?php endif;
+} ?>
+<div class="fieldset bill-address">
+    <h2 class="legend"><?php echo $this->__('Billing Address') ?></h2>
+    <ul class="form-list">
+        <li class="fields">
+            <div class="customer-name-prefix">
+                <div class="field name-prefix">
+                    <label for="address_prefix"><?php echo $this->__('Title') ?></label>
+
+                    <div class="input-box">
+                        <select id="address_prefix" name="address[prefix]" title="<?php echo $this->__('Title') ?>">
+                            <?php foreach ($this->getPrefixOptions() as $_option): ?>
+                                <option
+                                    value="<?php echo $_option ?>"<?php if ($_address->getTitle() == $_option): ?>
+                                    selected="selected"<?php endif; ?>><?php echo $this->__($_option) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="field name-firstname">
+                    <label for="address_firstname" class="required"><em>*</em><?php echo $this->__('First Name') ?>
+                    </label>
+
+                    <div class="input-box">
+                        <input type="text" id="address_firstname" name="address[firstname]"
+                               value="<?php echo $this->escapeHtml($_address->getFirstName()) ?>"
+                               title="<?php echo $this->__('First Name') ?>"
+                               __maxlength="50" class="input-text required-entry validate-length maximum-length-50"/>
+                    </div>
+                </div>
+                <div class="field name-lastname">
+                    <label for="address_lastname" class="required"><em>*</em><?php echo $this->__('Last Name') ?>
+                    </label>
+
+                    <div class="input-box">
+                        <input type="text" id="address_lastname" name="address[lastname]"
+                               value="<?php echo $this->escapeHtml($_address->getLastName()) ?>"
+                               title="<?php echo $this->__('Last Name') ?>" __maxlength="50"
+                               class="input-text required-entry validate-length maximum-length-50"/>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="fields">
+            <div class="field">
+                <label for="address_company"><?php echo $this->__('Company') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[company]" id="address_company"
+                           title="<?php echo $this->__('Company') ?>" __maxlength="50"
+                           value="<?php echo $this->escapeHtml($_address->getCompanyName()) ?>"
+                           class="input-text validate-length maximum-length-50"/>
+                </div>
+            </div>
+            <div class="field">
+                <label for="address_job_description"><?php echo $this->__('Job Description') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[job_description]" id="address_job_description"
+                           title="<?php echo $this->__('Job Description') ?>" __maxlength="50"
+                           value="<?php echo $this->escapeHtml($_address->getJobDescription()) ?>"
+                           class="input-text validate-length maximum-length-50"/>
+                </div>
+            </div>
+
+        </li>
+        <li class="fields">
+            <div class="field">
+                <label for="address_telephone" class="required"><em>*</em><?php echo $this->__('Phone') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[telephone]"
+                           value="<?php echo $this->escapeHtml($_address->getPhone()) ?>"
+                           title="<?php echo $this->__('Phone') ?>"
+                           class="input-text required-entry eway-validate-phone validate-length maximum-length-32"
+                           id="address_telephone" __maxlength="32"/>
+                </div>
+            </div>
+            <div class="field">
+                <label for="address_mobile"><?php echo $this->__('Mobile') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[mobile]"
+                           value="<?php echo $this->escapeHtml($_address->getMobile()) ?>"
+                           title="<?php echo $this->__('Mobile') ?>"
+                           class="input-text eway-validate-phone validate-length maximum-length-32"
+                           id="address_mobile" __maxlength="32"/>
+                </div>
+            </div>
+        </li>
+        <li class="fields">
+            <div class="field">
+                <label for="address_email"><?php echo $this->__('Email') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[email]" id="address_email" __maxlength="50"
+                           title="<?php echo $this->__('Email') ?>"
+                           value="<?php echo $this->escapeHtml($_address->getEmail()) ?>"
+                           class="input-text validate-email validate-length maximum-length-50"/>
+                </div>
+            </div>
+            <div class="field">
+                <label for="address_fax"><?php echo $this->__('Fax') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[fax]" id="address_fax" title="<?php echo $this->__('Fax') ?>"
+                           value="<?php echo $this->escapeHtml($_address->getFax()) ?>"
+                           class="input-text eway-validate-phone validate-length maximum-length-32" __maxlength="32"/>
+                </div>
+            </div>
+        </li>
+        <li class="wide">
+            <label for="address_street_1" class="required"><em>*</em><?php echo $this->__('Street Address') ?></label>
+
+            <div class="input-box">
+                <input type="text" name="address[street][]" __maxlength="50"
+                       value="<?php echo $this->escapeHtml($_address->getStreet1()) ?>"
+                       title="<?php echo $this->__('Street Address') ?>" id="address_street_1"
+                       class="input-text required-entry validate-length maximum-length-50"/>
+            </div>
+        </li>
+        <li class="wide">
+            <div class="input-box">
+                <input type="text" name="address[street][]" __maxlength="50"
+                       value="<?php echo $this->escapeHtml($_address->getStreet2()) ?>"
+                       title="<?php echo $this->__('Street Address') ?>" id="address_street_2"
+                       class="input-text validate-length maximum-length-50"/>
+            </div>
+        </li>
+        <li class="fields">
+            <div class="field">
+                <label for="address_city" class="required"><em>*</em><?php echo $this->__('City') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[city]" __maxlength="50"
+                           value="<?php echo $_address->getCity() ?>" title="<?php echo $this->__('City') ?>"
+                           class="input-text required-entry validate-length maximum-length-50" id="address_city"/>
+                </div>
+            </div>
+            <div class="field">
+                <label for="address_region_id" class="required"><em>*</em><?php echo $this->__('State/Province') ?>
+                </label>
+
+                <div class="input-box">
+                    <select id="address_region_id" name="address[region_id]"
+                            title="<?php echo $this->__('State/Province') ?>" class="validate-select"
+                            style="display:none;">
+                        <option value=""><?php echo $this->__('Please select region, state or province') ?></option>
+                    </select>
+                    <script type="text/javascript">
+                        //<![CDATA[
+                        $('address_region_id').setAttribute('defaultValue', "<?php echo $_address->getRegionId() ?>");
+                        //]]>
+                    </script>
+                    <input type="text" id="address_region" name="address[region]" __maxlength="50"
+                           value="<?php echo $this->escapeHtml($_address->getState()) ?>"
+                           title="<?php echo $this->__('State/Province') ?>"
+                           class="input-text validate-length maximum-length-50"/>
+                </div>
+            </div>
+        </li>
+        <li class="fields">
+            <div class="field">
+                <label for="address_zip" class="required"><em>*</em><?php echo $this->__('Zip/Postal Code') ?></label>
+
+                <div class="input-box">
+                    <input type="text" name="address[postcode]"
+                           value="<?php echo $this->escapeHtml($_address->getPostalCode()) ?>"
+                           title="<?php echo $this->__('Zip/Postal Code') ?>" id="address_zip"
+                           class="input-text validate-zip-international required-entry validate-length maximum-length-30"
+                           __maxlength="30"/>
+                </div>
+            </div>
+            <div class="field">
+                <label for="country" class="required"><em>*</em><?php echo $this->__('Country') ?></label>
+
+                <div class="input-box">
+                    <?php echo $this->getCountryHtmlSelect(strtoupper($_address->getCountry()), 'address[country_id]', 'address_country') ?>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="buttons-set">
+    <p class="required"><?php echo $this->__('* Required Fields') ?></p>
+
+    <p class="back-link"><a href="<?php echo $this->escapeUrl($this->getBackUrl()) ?>">
+            <small>&laquo; </small><?php echo $this->__('Back') ?></a></p>
+    <?php if($transparent || $iframe): ?>
+        <button type="button" onclick="<?php echo $submitFunction . '(this)' ?>" title="<?php echo $this->__('Save Credit Card') ?>"
+                class="button"><span><span><?php echo $this->__('Save Credit Card') ?></span></span>
+        </button>
+    <span id="save-please-wait" class="please-wait" style="display:none;">
+        <img class="v-middle" title="Loading..." alt="Loading..." src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . '/skin/frontend/rwd/default/images/opc-ajax-loader.gif' ?>"/>
+        <?php echo __('Please waiting ...') ?>
+    </span>
+
+    <?php else:?>
+        <button type="submit" title="<?php echo $this->__('Save Credit Card') ?>" class="button"><span><span><?php echo $this->__('Save Credit Card') ?></span></span></button>
+    <?php endif ?>
+</div>
+</form>
+
+<script type="text/javascript">
+    //<![CDATA[
+    var dataForm = new VarienForm('form-validate', true);
+    new RegionUpdater('address_country', 'address_region', 'address_region_id', <?php echo $this->helper('directory')->getRegionJson() ?>, undefined, 'address_zip');
+    EwayPayment.supportCardTypes = <?php echo json_encode(Mage::getSingleton('ewayrapid/config')->getSupportedCardTypes()) ?>;
+
+    $$('.cvv-what-is-this').each(function (element) {
+        Event.observe(element, 'click', toggleToolTip);
+    });
+
+    function toggleToolTip(event) {
+        if ($('payment-tool-tip')) {
+            $('payment-tool-tip').setStyle({
+                top: (Event.pointerY(event) - 200) + 'px'//,
+            })
+            $('payment-tool-tip').toggle();
+        }
+        Event.stop(event);
+    }
+    if ($('payment-tool-tip-close')) {
+        Event.observe($('payment-tool-tip-close'), 'click', toggleToolTip);
+    }
+
+    $('form-validate').onsubmit = function () {
+        <?php if($secureField) :?>
+            var formValid = secureForm.secureFormValidate();
+            var infoValid = dataForm.validator && dataForm.validator.validate();
+            return (formValid & infoValid);
+        <?php else :?>
+            return (dataForm.validator && dataForm.validator.validate());
+        <?php endif ?>
+    }
+    var ewayPayment = new EwayPayment($('form-validate'), '<?php echo Mage::getSingleton('ewayrapid/config')->getEncryptionKey() ?>');
+
+    $$('.help-disabled-cc a').each(function (element) {
+        Event.observe(element, 'click', toggleToolTipCc);
+    });
+
+    function toggleToolTipCc(event) {
+        if ($('cc-help-tool-tip')) {
+            $('cc-help-tool-tip').toggle();
+        }
+        Event.stop(event);
+    }
+    if ($('cc-help-tool-tip-close')) {
+        Event.observe($('cc-help-tool-tip-close'), 'click', toggleToolTipCc);
+    }
+
+    // TRANSPARENT REDIRECT
+    function beforeSubmit(obj) {
+        $('validate_from_date_message') != null ? $('validate_from_date_message').remove() : '';
+        $('ewayrapid_saved_start_month').removeClassName('validation-failed');
+        $('ewayrapid_saved_start_year').removeClassName('validation-failed');
+        $$('li.value_from_date')[0].removeClassName('validation-error');
+
+        if (typeof isTest !== 'undefined') {
+            // Alert error code ERR-012
+            alert('An error occurred while connecting to payment gateway. Please try again later.!');
+            return false;
+        }
+
+        //*********************************Valid From Date If Select********************************************************************
+        if($('ewayrapid_saved_start_year').value > 0 && $('ewayrapid_saved_start_month').value <= 0) {
+            $('validation-advice-year') && $('validation-advice-year').remove();
+            $('ewayrapid_saved_start_month').addClassName('validation-failed');
+            $('ewayrapid_saved_start_month').up('div').insert('<div class="validation-advice" id="validation-advice-month">Incorrect credit card from date.</div>');
+            return;
+        } else if($('ewayrapid_saved_start_year').value <= 0 && $('ewayrapid_saved_start_month').value > 0) {
+            $('validation-advice-month') && $('validation-advice-month').remove();
+            $('ewayrapid_saved_start_year').addClassName('validation-failed');
+            $('ewayrapid_saved_start_year').up('div').insert('<div class="validation-advice" id="validation-advice-year">Incorrect credit card from year.</div>');
+            return;
+        } else {
+            $('validation-advice-year') && $('validation-advice-year').remove();
+            $('validation-advice-month') && $('validation-advice-month').remove();
+        }
+
+        var from_date = new Date($('ewayrapid_saved_start_year').value + '-' + $('ewayrapid_saved_start_month').value).getTime();
+        var expiration_date = new Date($('ewayrapid_saved_expiration_yr').value + '-' + $('ewayrapid_saved_expiration').value).getTime();
+        if(Prototype.Browser.IE) {
+            from_date = new Date($('ewayrapid_saved_start_year').value, $('ewayrapid_saved_start_month').value, 1).getTime();
+            expiration_date = new Date($('ewayrapid_saved_expiration_yr').value, $('ewayrapid_saved_expiration').value, 1).getTime();
+        }
+        //console.log(from_date - expiration_date);
+
+        if(from_date - expiration_date > 0) {
+            $$('li.value_from_date')[0].insert({after: '<div style="" id="validate_from_date_message" ' +
+            'class="validation-advice">From Date is invalid. It must be earlier than Expiration Date.</div>'});
+            $('ewayrapid_saved_start_month').addClassName('validation-failed');
+            $('ewayrapid_saved_start_year').addClassName('validation-failed');
+            $$('li.value_from_date')[0].addClassName('validation-error');
+            return;
+        }
+        //******************************************************************************************************************************
+
+        var validate = dataForm.validator.validate();
+        if (!validate) {
+            return;
+        }
+
+        /*if ($('ewayrapid_saved_start_year').value != '' || $('ewayrapid_saved_start_month').value != '') {
+            if ((new Date($('ewayrapid_saved_expiration_yr').value + '-'
+                + ($('ewayrapid_saved_expiration').value <= 9 ? '0' : '') + $('ewayrapid_saved_expiration').value).getTime() )
+                - ( new Date($('ewayrapid_saved_start_year').value + '-'
+                + ($('ewayrapid_saved_start_month').value <= 9 ? '0' : '') + $('ewayrapid_saved_start_month').value).getTime() )
+                <= 0 ) {
+                $$('li.value_from_date')[0].insert({after: '<div style="" id="validate_from_date_message" ' +
+                    'class="validation-advice">From Date is invalid. It must be earlier than Expiration Date.</div>'});
+                $('ewayrapid_saved_start_month').addClassName('validation-failed');
+                $('ewayrapid_saved_start_year').addClassName('validation-failed');
+                $$('li.value_from_date')[0].addClassName('validation-error');
+                return;
+            }
+        }*/
+
+        // Waiting
+        $(obj).setStyle({'display': 'none'});
+        $('save-please-wait').setStyle({'display': 'block'});
+
+        // Get access code
+        new Ajax.Request('<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) ?>/ewayrapid/mycards/getAccessCode',
+            {
+                method: 'post',
+                parameters: $('form-validate').serialize(true),
+                onSuccess: function (transport) {
+                    if (transport.responseText) {
+                        var data = JSON.parse(transport.responseText);
+                        if (typeof data == 'object') {
+
+                            // Check login require
+                            if (data.login != undefined) {
+                                alert('Session has expired');
+                                window.location = window.location.href;
+                            }
+
+                            if (typeof data.AccessCode != 'undefined' & data.AccessCode != null) {
+
+                                var actionUrl = data.FormActionURL;
+                                $('form-validate').setAttribute('action', actionUrl);
+                                // Change card info
+                                $('ewayrapid_saved_cc_owner').setAttribute('name', 'EWAY_CARDNAME');
+                                <?php
+                                // Change card name if not edited
+                                 if (!$this->isEdit()) {
+                                    echo "$('ewayrapid_saved_cc_number').setAttribute('name', 'EWAY_CARDNUMBER');";
+                                 }
+                                 ?>
+                                $('ewayrapid_saved_expiration').setAttribute('name', 'EWAY_CARDEXPIRYMONTH');
+                                $('ewayrapid_saved_expiration_yr').setAttribute('name', 'EWAY_CARDEXPIRYYEAR');
+
+                                $('eway_accesscode').setValue(data.AccessCode);
+                                $('form-validate').submit();
+                                return;
+                            }
+                            else {
+                                // Alert error code ERR-012
+                                alert('An error occurred while connecting to payment gateway. Please try again later.!');
+                            }
+                        } else {
+                            alert(transport.responseText)
+                        }
+
+                        // Remove style waiting
+                        $(obj).setStyle({'display': 'block'});
+                        $('save-please-wait').setStyle({'display': 'none'});
+                    }
+                },
+                onFailure: function () {
+                    alert('Something went wrong...')
+                }
+            });
+        return false;
+    }
+
+    // Iframe
+
+    ewayReturnUrl = '';
+
+    function eWayRapidCallback (result, transactionID, errors) {
+        if (result == "Complete") {
+            setLocation(ewayReturnUrl);
+        } else if (result == "Error") {
+            alert("There was a problem  while connecting to payment gateway: " + errors);
+            dataForm.form.down('button').setStyle({'display': 'block'});
+            $('save-please-wait').setStyle({'display': 'none'});
+        } else{
+            dataForm.form.down('button').setStyle({'display': 'block'});
+            $('save-please-wait').setStyle({'display': 'none'});
+        }
+    }
+
+    function beforeSubmitIframe(obj) {
+        $('validate_from_date_message') != null ? $('validate_from_date_message').remove() : '';
+
+        if (typeof isTest !== 'undefined') {
+            // Alert error code ERR-012
+            alert('An error occurred while connecting to payment gateway. Please try again later.!');
+            return false;
+        }
+
+        var validate = dataForm.validator.validate();
+        if (!validate) {
+            return;
+        }
+
+        // Waiting
+        $(obj).setStyle({'display': 'none'});
+        $('save-please-wait').setStyle({'display': 'block'});
+
+        // Get access code
+        new Ajax.Request('<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) ?>/ewayrapid/mycards/getAccessCode',
+            {
+                method: 'post',
+                parameters: $('form-validate').serialize(true),
+                onSuccess: function (transport) {
+                    if (transport.responseText) {
+                        var data = JSON.parse(transport.responseText);
+                        if (typeof data == 'object') {
+
+                            // Check login require
+                            if (data.login != undefined) {
+                                alert('Session has expired');
+                                window.location = window.location.href;
+                            }
+
+                            if (typeof data.SharedPaymentUrl != 'undefined' & data.SharedPaymentUrl != null) {
+
+                                var eWAYConfig = {
+                                    sharedPaymentUrl: data.SharedPaymentUrl
+                                };
+
+                                ewayReturnUrl = data.ReturnUrl;
+
+                                eCrypt.showModalPayment(eWAYConfig, eWayRapidCallback);
+
+                                return;
+                            }
+                            else {
+                                // Alert error code ERR-012
+                                alert('An error occurred while connecting to payment gateway. Please try again later.!');
+                            }
+                        } else {
+                            alert(transport.responseText)
+                        }
+
+                        // Remove style waiting
+                        $(obj).setStyle({'display': 'block'});
+                        $('save-please-wait').setStyle({'display': 'none'});
+                    }
+                },
+                onFailure: function () {
+                    alert('Something went wrong...')
+                }
+            });
+        return false;
+    }
+
+    //]]>
+</script>

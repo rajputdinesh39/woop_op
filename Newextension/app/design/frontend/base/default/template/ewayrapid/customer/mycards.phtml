@@ -1,0 +1,62 @@
+<?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+<?php
+    $_tokens = Mage::helper('ewayrapid/customer')->getActiveTokenList();
+    $_defaultToken = Mage::helper('ewayrapid/customer')->getDefaultToken();
+    $_helper = Mage::helper('ewayrapid');
+?>
+<?php if($_helper->isSavedMethodEnabled()): ?>
+    <div class="page-title title-buttons">
+        <h1><?php echo $this->__('My Credit Cards') ?></h1>
+        <button type="button" title="<?php echo $this->__('Add New Credit Card') ?>" class="button"
+                onclick="window.location='<?php echo $this->getAddCreditCardUrl() ?>';">
+            <span><span><?php echo $this->__('Add New Credit Card') ?></span></span>
+        </button>
+    </div>
+    <?php if($_tokens): ?>
+        <table class="data-table" id="my-creditcards-table">
+            <col width="1" />
+            <col />
+            <col width="1" />
+            <col width="1" />
+            <thead>
+                <tr>
+                    <th><?php echo $this->__('Credit Card Type') ?></th>
+                    <th><?php echo $this->__('Credit Card Number') ?></th>
+                    <th><?php echo $this->__('Expiration Date') ?></th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($_tokens as $_id => $_token): ?>
+                <?php /* @var Eway_Rapid31_Model_Customer_Token $_token */ ?>
+                <tr>
+                    <td><span class="nobr"><?php echo $_token->getType() ? $_helper->getCcTypeName($_token->getType()) : $this->__('Unknown');  ?></span></td>
+                    <td><?php echo $_token->getCard() ?> <?php if($_defaultToken == $_id):?><?php echo $this->__('(Default)') ?><?php endif; ?></td>
+                    <td class="a-center"><?php echo $_token->getExpMonth() . ' / ' . $_token->getExpYear() ?></td>
+                    <td>
+                        <span class="nobr">
+                            <?php if(Mage::getSingleton('ewayrapid/config')->canEditToken()): ?>
+                                <?php if (Mage::helper('ewayrapid')->checkCardName($_token) != Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD) : ?>
+                                    <a href="<?php echo $this->getEditUrl($_id) ?>"><?php echo $this->__('Edit') ?></a>
+                                <?php else: ?>
+                                    &nbsp; &nbsp; &nbsp; &nbsp;
+                                <?php endif; ?>
+                                <span class="separator">|</span>
+                            <?php endif; ?>
+                            <a href="<?php echo $this->getDeleteUrl($_id) ?>"
+                               onclick="return confirm('<?php echo $this->__('Are you sure to delete this Credit Card?') ?>');"><?php echo $this->__('Delete') ?></a>
+                            <?php if($_defaultToken != $_id): ?>
+                                <span class="separator">|</span>
+                                <a href="<?php echo $this->getUpdateDefaultUrl($_id) ?>"><?php echo $this->__('Set as Default') ?></a>
+                            <?php endif; ?>
+                        </span>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <script type="text/javascript">decorateTable('my-creditcards-table');</script>
+    <?php else: ?>
+        <p><?php echo $this->__('You have no credit cards. <a href="%s">Click here</a> to create new one.', $this->getAddCreditCardUrl()); ?></p>
+    <?php endif ?>
+<?php endif; ?>

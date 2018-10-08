@@ -1,0 +1,385 @@
+<?php
+
+$billingAddress = $this->getBillingAddress();
+$shippingAddress = $this->getShippingAddress();
+?>
+
+
+<div class="main">
+<div class="col-main">
+<div class="page-title">
+    <h1>Review Order</h1>
+</div>
+<h2 class="sub-title">
+    Please choice your shipping method
+</h2>
+
+<div class="paypal-review-order">
+
+<div class="info-set col2-set">
+<div class="col-1" id="billing-address">
+    <h2 class="legend">Billing Address</h2>
+    <fieldset>
+        <ul class="form-list form-list-narrow">
+            <li id="billing-address-form" class="address-form">
+                <fieldset>
+                    <ul>
+                        <li class="fields">
+                            <div class="customer-name">
+                                <div class="field name-firstname">
+                                    <label for="billing:firstname"
+                                           class="required"><?php echo $this->__('First Name') ?></label>
+
+                                    <div class="input-box">
+                                        <input readonly type="text" id="" name=""
+                                               value="<?php echo $billingAddress ? $billingAddress->getFirstname() : ''; ?>"
+                                               title="First Name" maxlength="255" class="input-text">
+                                    </div>
+                                </div>
+                                <div class="field name-lastname">
+                                    <label for="billing:lastname"
+                                           class="required"><?php echo $this->__('Last Name') ?></label>
+
+                                    <div class="input-box">
+                                        <input readonly type="text" id="billing:lastname" name=""
+                                               value="<?php echo $billingAddress ? $billingAddress->getLastname() : ''; ?>"
+                                               title="<?php echo $this->__('Last Name') ?>" maxlength="255"
+                                               class="input-text">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:company"><?php echo $this->__('Company') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" id="billing:company" name="billing[company]"
+                                           value="<?php echo $billingAddress ? $billingAddress->getCompany() : ''; ?>"
+                                           title="<?php echo $this->__('Company') ?>" class="input-text">
+                                </div>
+                            </div>
+                        </li>
+                        <li class="wide">
+                            <label for="billing:street1" class="required"><?php echo $this->__('Address') ?></label>
+
+                            <div class="input-box">
+                                <input readonly type="text" title="Street Address" name="billing[street][]"
+                                       id="billing:street1"
+                                       value="<?php echo $billingAddress ? $billingAddress->getStreet1() : ''; ?>"
+                                       class="input-text">
+                            </div>
+                        </li>
+                        <li class="add-field">
+                            <div class="input-box">
+                                <input readonly type="text" title="Street Address 2" name="billing[street][]"
+                                       id="billing:street2"
+                                       value="<?php echo $billingAddress ? $billingAddress->getStreet2() : ''; ?>"
+                                       class="input-text">
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:city" class="required"><?php echo $this->__('City') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" title="City" name="billing[city]"
+                                           value="<?php echo $billingAddress ? $billingAddress->getCity() : ''; ?>"
+                                           class="input-text  required-entry" id="billing:city">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="billing:region_id"
+                                       class=""><?php echo $this->__('State/Province') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" id="shipping:region" name="shipping[region]"
+                                           value="<?php echo $billingAddress ? $billingAddress->getState() : ''; ?>"
+                                           title="State/Province" class="input-text regions" style="">
+                                </div>
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:postcode"
+                                       class="required"><?php echo $this->__('Zip/Postal Code') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" title="Zip/Postal Code" name="billing[postcode]"
+                                           id="billing:postcode"
+                                           value="<?php echo $billingAddress ? $billingAddress->getPostalCode() : ''; ?>"
+                                           class="input-text validate-zip-international  required-entry">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="billing:country_id"
+                                       class="required"><?php echo $this->__('Country') ?></label>
+
+                                <div class="input-box">
+                                    <select name="billing[country_id]" id="billing:country_id" class="validate-select"
+                                            title="<?php echo $this->__('Country') ?>">
+                                        <option value=""
+                                                selected="selected"><?php echo $billingAddress ? Mage::app()->getLocale()->getCountryTranslation($billingAddress->getCountryId()) : ''; ?></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:telephone"
+                                       class="required"><?php echo $this->__('Telephone') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" name=""
+                                           value="<?php echo $billingAddress ? $billingAddress->getTelephone() : ''; ?>"
+                                           title="Telephone"
+                                           class="input-text" id="billing:telephone">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="billing:fax"><?php echo $this->__('Fax') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" name=""
+                                           value="<?php echo $billingAddress ? $billingAddress->getFax() : ''; ?>"
+                                           title="Fax" class="input-text"
+                                           id="billing:fax">
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                </fieldset>
+            </li>
+        </ul>
+    </fieldset>
+</div>
+<div class="col-2" id="shipping-address">
+    <h2 class="legend">Shipping Address</h2>
+    <fieldset>
+        <ul class="form-list form-list-narrow">
+            <li id="billing-address-form" class="address-form">
+                <fieldset>
+                    <ul>
+                        <li class="fields">
+                            <div class="customer-name">
+                                <div class="field name-firstname">
+                                    <label for="billing:firstname"
+                                           class="required"><?php echo $this->__('First Name') ?></label>
+
+                                    <div class="input-box">
+                                        <input readonly type="text" id="" name=""
+                                               value="<?php echo $shippingAddress ? $shippingAddress->getFirstname() : ''; ?>"
+                                               title="First Name" maxlength="255" class="input-text">
+                                    </div>
+                                </div>
+                                <div class="field name-lastname">
+                                    <label for="billing:lastname"
+                                           class="required"><?php echo $this->__('Last Name') ?></label>
+
+                                    <div class="input-box">
+                                        <input readonly type="text" id="billing:lastname" name=""
+                                               value="<?php echo $shippingAddress ? $shippingAddress->getLastname() : ''; ?>"
+                                               title="<?php echo $this->__('Last Name') ?>" maxlength="255"
+                                               class="input-text">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:company"><?php echo $this->__('Company') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" id="billing:company" name="billing[company]"
+                                           value="<?php echo $shippingAddress ? $shippingAddress->getCompany() : ''; ?>"
+                                           title="<?php echo $this->__('Company') ?>" class="input-text">
+                                </div>
+                            </div>
+                        </li>
+                        <li class="wide">
+                            <label for="billing:street1" class="required"><?php echo $this->__('Address') ?></label>
+
+                            <div class="input-box">
+                                <input readonly type="text" title="Street Address" name="billing[street][]"
+                                       id="billing:street1"
+                                       value="<?php echo $shippingAddress ? $shippingAddress->getStreet1() : ''; ?>"
+                                       class="input-text">
+                            </div>
+                        </li>
+                        <li class="add-field">
+                            <div class="input-box">
+                                <input readonly type="text" title="Street Address 2" name="billing[street][]"
+                                       id="billing:street2"
+                                       value="<?php echo $shippingAddress ? $shippingAddress->getStreet2() : ''; ?>"
+                                       class="input-text">
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:city" class="required"><?php echo $this->__('City') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" title="City" name="billing[city]"
+                                           value="<?php echo $shippingAddress ? $shippingAddress->getCity() : ''; ?>"
+                                           class="input-text  required-entry" id="billing:city">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="billing:region_id"
+                                       class=""><?php echo $this->__('State/Province') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" id="shipping:region" name="shipping[region]"
+                                           value="<?php echo $shippingAddress ? $shippingAddress->getState() : ''; ?>"
+                                           title="State/Province" class="input-text regions" style="">
+                                </div>
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:postcode"
+                                       class="required"><?php echo $this->__('Zip/Postal Code') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" title="Zip/Postal Code" name="billing[postcode]"
+                                           id="billing:postcode"
+                                           value="<?php echo $shippingAddress ? $shippingAddress->getPostalCode() : ''; ?>"
+                                           class="input-text validate-zip-international  required-entry">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="billing:country_id"
+                                       class="required"><?php echo $this->__('Country') ?></label>
+
+                                <div class="input-box">
+                                    <select name="billing[country_id]" id="billing:country_id" class="validate-select"
+                                            title="<?php echo $this->__('Country') ?>">
+                                        <option value=""
+                                                selected="selected"><?php echo $shippingAddress ? Mage::app()->getLocale()->getCountryTranslation($shippingAddress->getCountryId()) : ''; ?></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="fields">
+                            <div class="field">
+                                <label for="billing:telephone"
+                                       class="required"><?php echo $this->__('Telephone') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" name="billing[telephone]"
+                                           value="<?php echo $shippingAddress ? $shippingAddress->getTelephone() : ''; ?>"
+                                           title="Telephone"
+                                           class="input-text  required-entry" id="billing:telephone">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="billing:fax"><?php echo $this->__('Fax') ?></label>
+
+                                <div class="input-box">
+                                    <input readonly type="text" name="billing[fax]"
+                                           value="<?php echo $shippingAddress ? $shippingAddress->getFax() : ''; ?>"
+                                           title="Fax" class="input-text"
+                                           id="billing:fax">
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                </fieldset>
+            </li>
+        </ul>
+    </fieldset>
+</div>
+</div>
+
+<div class="info-set col2-set">
+    <div class="col-2">
+        <div class="box paypal-shipping-method">
+            <div class="box-title">
+                <h3>Shipping Method</h3>
+            </div>
+            <form method="post" id="order_review_form" action="">
+                <input type="hidden" name="EWAY_ACCESSCODE" value="<?php echo $this->getAccessCode() ?>"/>
+                <input type="hidden" name="EWAY_PAYMENTTYPE" value="paypal"/>
+                <input type="hidden" name="EWAY_ISREFERENCETRANSACTION" value="false"/>
+
+                <div class="box-content">
+                    <fieldset id="shipping-method-container">
+                        <select name="shipping_method" id="shipping_method" style="width:250px;"
+                                class="required-entry" <?php echo $this->getCurrentRateCode() ? 'disabled' : '' ?>>
+                            <?php if (!$this->getCurrentRateCode()): ?>
+                                <option value=""><?php echo $this->__('Please select a shipping method...') ?></option>
+                            <?php endif; ?>
+
+                            <?php foreach ($this->getRates() as $code => $rates) { ?>
+                                <optgroup label="<?php echo $this->escapeHtml($this->getCarrierName($code)) ?>"
+                                          style="font-style:normal;">
+                                    <?php foreach ($rates as $rate): ?>
+                                        <option
+                                            value="<?php echo $rate->getCode(); ?>" <?php echo ($this->getCurrentRateCode() === $rate) ? ' selected="selected"' : ''; ?>>
+                                            <?php echo $rate->getMethodTitle() . ' - ' . $rate->getPrice(); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                            <?php } ?>
+                        </select>
+
+                        <?php if ($this->getCurrentRateCode()) { ?>
+                            <input type="hidden" name="shipping_method"
+                                   value="<?php echo $this->getCurrentRateCode()->getCode() ?>"/>
+                        <?php } ?>
+                    </fieldset>
+                    <div style="display: none;" id="shipping_method_update">
+                        <p><?php echo $this->__('Please update order data to get shipping methods and rates') ?></p>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="buttons-set buttons-set-order" id="review-buttons-container">
+    <button type="button" id="review_button" value="<?php echo $this->__('Continue') ?>" class="button btn-checkout">
+        <span><span><?php echo $this->__('Continue') ?></span></span>
+    </button>
+
+                <span class="please-wait" id="review-please-wait" style="display: none;">
+                    <img src="http://eway.local/skin/frontend/default/default/images/opc-ajax-loader.gif"
+                         alt="Submitting order information..." title="Submitting order information..." class="v-middle"> Submitting order information...
+                </span>
+</div>
+
+</div>
+<script type="text/javascript">
+
+    $("review_button").observe('click', function () {
+        var validator = new Validation('order_review_form');
+        if (validator.validate()) {
+            $(this).hide();
+            $("review-please-wait").show();
+            var request = new Ajax.Request(
+                '<?php echo $this->getActionUrl(); ?>',
+                {
+                    method: 'post',
+                    onComplete: {},
+                    parameters: $("order_review_form").serialize(),
+                    onSuccess: function (response) {
+                        if (response) {
+                            var json = response.responseText.evalJSON();
+                            $("order_review_form").insert(json.input_post);
+                            $("order_review_form").writeAttribute("action", json.form_action);
+                            $("order_review_form").submit();
+                        }
+                        return true;
+                    },
+                    onFailure: {}
+                }
+            );
+        }
+        return false;
+    });
+</script>
+</div>
+</div>

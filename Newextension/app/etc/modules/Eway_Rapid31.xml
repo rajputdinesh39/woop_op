@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Eway_Rapid31>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Eway_Rapid31>
+    </modules>
+</config>

@@ -1,0 +1,188 @@
+.sp-methods select.ewayrapid_saved_token {width: 180px; margin-right: 10px;}
+#onestepcheckout-form #payment_form_ewayrapid_saved input.input-text:disabled,
+.sp-methods input.input-text:disabled {background: rgb(235, 235, 228);} /* Default disabled color */
+
+.sp-methods .form-list .control .input-box {margin-left: 170px;}
+
+.form-list .help-disabled-cc {width: 290px; position: relative;}
+.form-list .help-disabled-cc .tool-tip {width: 330px; top: -70px; left: 80px;}
+.sp-methods .form-list { padding-left: 0px; }
+
+
+.recurring-agree {float: left; margin: 0 4px 0 0; padding: 0; }
+.lable-for-recurring {float: left;line-height: 14px; }
+
+#transparent_card h3 { width: 40% !important; margin-left: 30% !important; }
+#transparent_card ul.form-list { width: 40% !important; margin-left: 30%; border: 1px solid #bbafa0; padding: 20px 20px 20px 20px; }
+#transparent_card ul.form-list select { width: 99% !important; }
+#transparent_card label { text-align: left !important; }
+#transparent_card input { width: 97% !important; }
+#transparent_card .input-box { width: 98% !important; }
+#transparent_card .cvv-what-is-this { margin-left: 15px;}
+#payment_form_mastercard_saved .saved_token_mastercard_field { clear: both; display: block;}
+.saved_token_mastercard_field #ewayrapid_saved_token { float: left; margin-right: 10px;}
+#ul_payment_form_ewayrapid_notsaved { margin-left: 20px;}
+#ewayrapid_saved_cc_type_exp_div .input-box .v-fix #advice-validate-cc-exp-ewayrapid_saved_expiration, #ewayrapid_notsaved_cc_type_exp_div .input-box .v-fix #advice-validate-cc-exp-ewayrapid_notsaved_expiration {  width: 146px;  word-wrap: break-word;  margin-right: 0 !important;  }
+
+#ewayrapid_saved_cc_type_exp_div .input-box .v-fix #advice-required-entry-ewayrapid_saved_expiration_yr,
+#ewayrapid_notsaved_cc_type_exp_div .input-box  .v-fix #advice-required-entry-ewayrapid_notsaved_expiration_yr{  width: 79px;  word-wrap: break-word;  margin-right: 0 !important;  }
+.help-disabled-cc.validation-passed .card-number-help { margin-left: 5px;}
+
+.eway-saved-div-box  {float: left;}
+.eway-saved-label-box  {float: left;}
+.eway-saved-edit-box { float: left;}
+.eway-saved-select-box {float: left;margin-left: 10px;}
+/** support 1.9 */
+#payment_form_ewayrapid_saved #ul-eway-saved-div-box { float: left;  width: 100%; }
+#onestepcheckout-form #ewayrapid_saved_cc_type_exp_div .v-fix,
+#onestepcheckout-form #ewayrapid_notsaved_cc_type_exp_div .v-fix,
+#one-step-checkout-form #ewayrapid_saved_cc_type_exp_div .v-fix,
+#one-step-checkout-form #ewayrapid_notsaved_cc_type_exp_div .v-fix { width: 48%; }
+/*gcheckout-onepage*/
+#gcheckout-onepage-form #gcheckout-payment-methods #p_method_ewayrapid_notsaved,
+#gcheckout-onepage-form #gcheckout-payment-methods #p_method_ewayrapid_saved { float: none; margin: 0px 0px 0px 0px !important;}
+#gcheckout-onepage-form #gcheckout-payment-methods #p_method_checkmo,
+#gcheckout-onepage-form #gcheckout-payment-methods #p_method_ccsave,
+#gcheckout-onepage-form #gcheckout-payment-methods #p_method_cashondelivery { float: none; margin: 0px 0px 0px 0px !important;}
+#gcheckout-onepage-form #gcheckout-payment-methods #payment_form_ewayrapid_notsaved,
+#gcheckout-onepage-form #gcheckout-payment-methods #payment_form_ewayrapid_saved { margin-bottom: 10px !important; }
+#gcheckout-onepage-form #gcheckout-payment-methods #ul_payment_form_ewayrapid_notsaved,
+#gcheckout-onepage-form #gcheckout-payment-methods #ul_payment_form_ewayrapid_saved,
+#gcheckout-onepage-form #gcheckout-payment-methods #payment_form_ewayrapid_notsaved,
+#gcheckout-onepage-form #gcheckout-payment-methods #payment_form_ewayrapid_saved { width:90% !important;padding: 5px !important; }
+#gcheckout-onepage-form #gcheckout-payment-methods #ul_payment_form_ewayrapid_notsaved,
+#gcheckout-onepage-form #gcheckout-payment-methods #ul_payment_form_ewayrapid_saved { margin-top: 7px !important; }
+#gcheckout-onepage-form #gcheckout-payment-methods #ul-eway-saved-div-box #ewayrapid_saved_token { margin-left: 2px !important; float: left; }
+#gcheckout-onepage-form #gcheckout-payment-methods .eway-saved-div-box { padding: 5px !important; width: 94% !important;}
+#gcheckout-onepage-form #gcheckout-payment-methods #ul-eway-saved-div-box #ewayrapid_saved_token { width: 50% !important;margin-right: 5px !important;}
+#one-step-checkout-form #onestepcheckout-payment-methods #ul-eway-saved-div-box #ewayrapid_saved_token { width: 48% !important;margin-left: 5px !important;margin-right: 5px !important;float: left; }
+#container_payment_method_ewayrapid_saved label,
+#container_payment_method_ewayrapid_notsaved label{ text-align: left; }
+.eway-saved-label-box { width: auto !important; }
+
+#payment_form_ewayrapid_ewayone li {
+    clear: both;
+    display: block;
+}
+
+.opc-col-right #eway_save_paypal{
+    padding-top: 12px;
+}
+
+#onestepcheckout-form #eway_save_paypal{
+    margin: 6px 0;
+}
+
+#onestepcheckout-form #eway_save_masterpass{
+    margin: 10px 0;
+}
+
+#payment_form_ewayrapid_ewayone li#eway_save_card input {
+    vertical-align: top;
+    margin-top: 6px;
+}
+#payment_form_ewayrapid_ewayone li#eway_save_card label {
+    float: none !important;
+}
+
+#onestepcheckout-payment-methods #ul_payment_form_ewayrapid_ewayone .input-box {
+    max-width: 90%;
+}
+
+#onestepcheckout-payment-methods #ewayrapid_ewayone_token {
+    max-width: 250px;
+}
+
+#ewayrapid_ewayone_edit {
+    margin: 4px 0 0 15px;
+    vertical-align: top;
+    display: inline-block;
+}
+#payment_form_ewayrapid_ewayone #eway_save_creditcard > ul {
+    margin-left: 0 !important;
+}
+
+#ewayrapid_ewayone_cc_cid {
+    width: 100px !important;
+}
+
+#ewayrapid_ewayone_token{
+    max-width: 200px;
+    width: 100%;
+    margin: 0 0 10px 10px;
+}
+
+#gcheckout-payment-methods dl dt{ float: none; width: 100%;}
+#payment_form_ewayrapid_ewayone { margin-bottom: 10px;}
+#gcheckout-payment-methods dl dt input[type="radio"] { float: none; padding: 0; margin: 0 5px 0 0 }
+#gcheckout-payment-methods dl dt label { background: none; display: inline-block;}
+#payment_form_ewayrapid_ewayone #eway_save_card .v-fix { float: none;}
+#ul_payment_form_ewayrapid_ewayone { margin-left: 0 !important; text-align: left; width: 80%; background: none;}
+#firecheckout-form .eway-saved-label-box {width: 100% !important;}
+
+#ul-eway-saved-div-box .eway-saved-div-box {width: 100%;}
+#ul-eway-saved-div-box .eway-saved-div-box > .eway-saved-label-box{
+    float: none; display: block; margin-bottom: 2px;
+}
+
+.sp-methods.not-login-methods > li > ul#ul-eway-saved-div-box {display: none;}
+#payment_form_ewayrapid_ewayone > li > #ul-eway-saved-div-box { width: 95%;margin-top: 0px;border-top:none;}
+#onestepcheckout-form #payment_form_ewayrapid_ewayone > li:first-child {margin: 0px}
+#gcheckout-onepage-form #payment_form_ewayrapid_ewayone > li:first-child {margin: 0px}
+#gcheckout-onepage-form #ul_payment_form_ewayrapid_ewayone {margin-top: 5px}
+#gcheckout-onepage-form #ul_payment_form_ewayrapid_ewayone:before {display:none;}
+#gcheckout-onepage-form #ul_payment_form_ewayrapid_ewayone:after {display:none;}
+
+.secure-form-input{
+    height: 40px;
+    width: 300px;
+    max-width: 100%;
+}
+
+.secure-form-error{
+    color: #df280a;
+    font-size: 13px;
+    padding-top: 5px;
+    display: inline-block;
+}
+
+
+/*MageStore OSC*/
+#onestepcheckout-payment-methods #payment_form_ewayrapid_ewayone #cc-help-tool-tip{
+    position: static;
+}
+
+#onestepcheckout-payment-methods .secure-form-input{
+    height: 55px;
+}
+
+#onestepcheckout-payment-methods .secure-form-input.secure-form-cvn{
+    height: 40px;
+    padding-top: 0;
+}
+
+/*IWD OSC*/
+.opc-wrapper-opc .secure-form-error{
+    color: #df280a;
+}
+
+#gcheckout-payment-methods #payment_form_ewayrapid_ewayone{
+    padding-top: 10px;
+}
+.onestepcheckout-column-middle .payment-methods dd{
+    padding-top: 0;
+}
+
+#gcheckout-payment-methods #payment_form_ewayrapid_ewayone li{
+    padding-left: 10px;
+}
+#gcheckout-payment-methods .secure-form-input{
+    height: 50px;
+}
+
+#gcheckout-payment-methods #payment_form_ewayrapid_ewayone .input-box{
+    margin: 0;
+    padding: 0;
+    height:auto;
+    clear: none;
+}

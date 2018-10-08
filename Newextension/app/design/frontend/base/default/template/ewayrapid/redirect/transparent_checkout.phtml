@@ -1,0 +1,37 @@
+<?php
+$_code = $this->getMethodCode();
+$accessCode = $this->getAccessCode();
+?>
+
+<form method="post" action="<?php echo Mage::getSingleton('core/session')->getFormActionUrl(); ?>"
+      name="transparent_card" id="transparent_card">
+    <h4><span class="please-wait" id="payment-please-wait" style="display: block;float: left;"><img
+                src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif'); ?>" alt="Connecting..."
+                title="Connecting..." class="v-middle"> Connecting...</span></h4>
+    <input type="hidden" name="EWAY_ACCESSCODE" value="<?php echo $accessCode; ?>"/>
+
+    <?php if ($this->_transMethod == Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD || $this->_transMethod == Eway_Rapid31_Model_Config::PAYPAL_EXPRESS_METHOD) { ?>
+        <input type="hidden" name="EWAY_PAYMENTTYPE" value="paypal"/>
+    <?php } elseif ($this->_transMethod == Eway_Rapid31_Model_Config::MASTERPASS_METHOD) { ?>
+        <input type="hidden" name="EWAY_PAYMENTTYPE" value="masterpass"/>
+        <?php if($this->hasVerification() && Mage::getSingleton('core/session')->getInfoCard()->getCid()): ?>
+            <input type="hidden" title="<?php echo $this->__('Card Verification Number') ?>"
+                   class="" id="EWAY_CARDCVN" name="EWAY_CARDCVN" value="<?php echo Mage::getSingleton('core/session')->getInfoCard()->getCid(); ?>"
+                />
+        <?php endif; ?>
+    <?php } elseif($this->_transMethod == Eway_Rapid31_Model_Config::VISA_CHECKOUT_METHOD) {?>
+        <input type="hidden" name="EWAY_PAYMENTTYPE" value="visacheckout"/>
+        <input type="hidden" id="visa_checkout_callid" name="VISA_CHECKOUT_CALLID"
+               value="<?php echo Mage::getSingleton('core/session')->getVisaCheckoutCallId() ?>"/>
+        <input type="hidden" id="visa_checkout_response" name="VISA_CHECKOUT_RESPONSE" value=""/>
+    <?php } ?>
+
+    <?php if ($this->_transMethod == Eway_Rapid31_Model_Config::PAYPAL_EXPRESS_METHOD) { ?>
+        <input type="hidden" name="EWAY_NEWSHIPPINGTOTAL" value="<?php echo @$this->getNewShipping(); ?>"/>
+        <input type="hidden" name="EWAY_ISREFERENCETRANSACTION" value="false"/>
+    <?php } ?>
+</form>
+
+<script type="text/javascript">
+    document.getElementById("transparent_card").submit();
+</script>

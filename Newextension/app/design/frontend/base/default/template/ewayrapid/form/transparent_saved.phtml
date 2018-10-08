@@ -1,0 +1,344 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+$_code = $this->getMethodCode();
+$_tokens = $this->getTokenList();
+?>
+
+<ul class="sp-methods" id="payment_form_<?php echo $_code ?>"
+    style="display:none; padding-left: 16px; padding-bottom: 8px; border: 1px solid rgb(193, 193, 193);">
+
+    <li>
+    <ul class="form-list" style="display: block;" id="ul-eway-saved-div-box">
+        <li>
+            <div class="eway-saved-div-box">
+                <label class="eway-saved-label-box"><?php echo $this->__('Saved Details') ?></label>
+                <select id="ewayrapid_saved_token" name="payment[saved_token]"
+                        class="ewayrapid_saved_token eway-saved-select-box">
+                    <?php
+                    $_tokens = $this->getTokenList();
+                    $_defaultToken = isset($_tokens['default_token']) ? $_tokens['default_token'] : false;
+                    $_defaultLabel = $_firstLabel = '';
+                    ?>
+                    <?php foreach ($_tokens['tokens'] as $_key => $_token):
+                        if(!$_firstLabel) $_firstLabel = $_token->getCard();
+                        if($_key == $_defaultToken) :
+                            $_defaultLabel = $_token->getCard();
+                        endif;
+                        ?>
+                        <option value="<?php echo $_key ?>"
+                                rel="<?php echo $this->checkCardName($_token); ?>"
+                                <?php if ($_key == $_defaultToken): ?>selected="selected"<?php endif; ?>>
+                            <?php echo $_token->getCard() ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <?php if(!$_defaultLabel) $_defaultLabel = strtolower($_firstLabel) == 'paypal' ? $_firstLabel : ''; ?>
+
+                <?php if (Mage::getSingleton('ewayrapid/config')->canEditToken() && count($_tokens['tokens']) > 1): ?>
+                    <div class="v-fix eway-saved-edit-box">
+                        <a style="<?php echo strtolower($_defaultLabel) === 'paypal' ? 'display:none;' : ''; ?>" id="ewayrapid_saved_edit" class="ewayrapid_saved_edit" href="javascript:void(0);"><?php echo $this->__('Edit') ?></a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </li>
+    </ul>
+    </li>
+
+
+    <li id="eway_save_creditcard">
+        <input id="p_method_ewayrapid_saved_mastercard" rel="ul_payment_form_<?php echo $_code ?>"
+               value="<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>" type="radio"
+               name="payment[transparent_saved]" title="Check / Money order" class="radio element_save_creditcard" autocomplete="off"
+               checked="checked"
+            />
+        <label for="p_method_ewayrapid_saved_mastercard" class="element_save_creditcard">Credit Card </label>
+
+    <ul class="form-list ul-form-list" id="ul_payment_form_<?php echo $_code ?>"
+        style="display: block;margin-left: 20px;">
+        <li class="element_save_creditcard">
+            <label for="<?php echo $_code ?>_cc_owner"
+                   class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
+            <div class="input-box">
+                <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry"
+                       id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]"
+                       value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>"/>
+            </div>
+        </li>
+        <li class="element_save_creditcard">
+            <label for="<?php echo $_code ?>_cc_number"
+                   class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
+
+            <div class="input-box">
+                <input type="text" id="<?php echo $_code ?>_cc_number"
+                       name="payment[cc_number]"
+                       title="<?php echo $this->__('Credit Card Number') ?>"
+                       data-eway-encrypt-name="payment[cc_number]"
+                       class="input-text validate-cc-number validate-cc-type-auto" value="" pattern="\d*"/>
+                <input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[cc_type]"/>
+            </div>
+        </li>
+        <li id="<?php echo $_code ?>_cc_type_exp_div" class="element_save_creditcard">
+            <label for="<?php echo $_code ?>_expiration"
+                   class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+
+            <div class="input-box">
+                <div class="v-fix">
+                    <select id="<?php echo $_code ?>_expiration" name="payment[cc_exp_month]"
+                            class="month validate-cc-exp required-entry">
+                        <?php $_ccExpMonth = $this->getInfoData('cc_exp_month') ?>
+                        <?php foreach ($this->getCcMonths() as $k => $v): ?>
+                            <option
+                                value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                        <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="v-fix">
+                    <?php $_ccExpYear = $this->getInfoData('cc_exp_year') ?>
+                    <select id="<?php echo $_code ?>_expiration_yr" name="payment[cc_exp_year]"
+                            class="year required-entry">
+                        <?php foreach ($this->getCcYears() as $k => $v): ?>
+                            <option
+                                value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                        <?php endforeach ?>
+                    </select>
+                </div>
+            </div>
+        </li>
+        <?php echo $this->getChildHtml() ?>
+        <?php if ($this->hasVerification()): ?>
+            <li id="<?php echo $_code ?>_cc_type_cvv_div" style="<?php echo strtolower($_defaultLabel) == 'paypal' ? 'display:none;' : '' ?>">
+                <label for="<?php echo $_code ?>_cc_cid"
+                       class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
+
+                <div class="input-box">
+                    <div class="v-fix" id="v-fix-change">
+                        <input type="text" title="<?php echo $this->__('Card Verification Number') ?>"
+                               name="payment[cc_cid]"
+                               disabled="disabled"
+                               class="input-text cvv required-entry validate-cc-cvn" id="<?php echo $_code ?>_cc_cid"
+                               data-eway-encrypt-name="payment[cc_cid]"
+                               value="" pattern="\d*"/>
+                    </div>
+                    <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+                </div>
+            </li>
+            <?php if ($this->getIsRecurring()) { ?>
+                <li>
+                    <p>I authorize <?php echo Mage::app()->getStore()->getName(); ?> to charge the available balance
+                        in my credit card for the future payments of this order. To make a change, I can go to
+                        <a href="<?php echo Mage::getUrl('checkout/cart'); ?>">Cart</a>
+                    </p>
+                    <input type="checkbox" name="recurring-agree" class="recurring-agree required-entry"/><label class="lable-for-recurring" for="">Agree</label>
+                </li>
+            <?php } ?>
+        <?php endif; ?>
+    </ul>
+    </li>
+
+    <?php if ($this->getEnablePaypalStandard()) { ?>
+        <li id="eway_save_paypal" style="display: none">
+            <input id="p_method_ewayrapid_saved_transparent_paypal" rel="payment_form_paypal_saved"
+                   value="<?php echo Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD ?>" type="radio"
+                   name="payment[transparent_saved]" title="Paypal - eWAY (saved)" class="radio" autocomplete="off">
+            <label for="p_method_ewayrapid_saved_transparent_paypal">Paypal Standard </label>
+        </li>
+    <?php } ?>
+
+    <?php if ($this->getEnableMasterPass() && Mage::helper('ewayrapid/data')->getPaymentAction() == Eway_Rapid31_Model_Method_Notsaved::ACTION_AUTHORIZE_CAPTURE) { ?>
+        <li id="eway_save_masterpass" style="display: none">
+            <input id="p_method_ewayrapid_transparent_masterpass" rel="payment_form_masterpass_saved"
+                   value="<?php echo Eway_Rapid31_Model_Config::MASTERPASS_METHOD ?>" type="radio"
+                   name="payment[transparent_saved]" title="MasterPass - eWAY (saved)" class="radio" autocomplete="off">
+            <label for="p_method_ewayrapid_transparent_masterpass">MasterPass </label>
+        </li>
+    <?php } ?>
+</ul>
+
+<script type="text/javascript">
+    var _saved = 0;
+    var ewayPaymentToken = new EwayPaymentToken(
+        <?php echo $_tokens['tokens_json'] ?>,
+        <?php echo count($_tokens['tokens']) ?>,
+        false,
+        '<?php echo $this->__('Edit') ?>',
+        '<?php echo $this->__('Cancel edit') ?>'
+    );
+
+    $$('.help-disabled-cc a').each(function (element) {
+        Event.observe(element, 'click', toggleToolTipCc);
+    });
+
+    function toggleToolTipCc(event) {
+        if ($('cc-help-tool-tip')) {
+            $('cc-help-tool-tip').toggle();
+        }
+        Event.stop(event);
+    }
+    if ($('cc-help-tool-tip-close')) {
+        Event.observe($('cc-help-tool-tip-close'), 'click', toggleToolTipCc);
+    }
+
+    var _tokenCount = <?php echo count($_tokens['tokens']); ?>;
+    //console.log(_tokenCount);
+    var _defaultLabel = "<?php echo strtolower($_defaultLabel); ?>";
+    //console.log('default Label: ' + _defaultLabel);
+    if(_defaultLabel == 'paypal') {
+        $('ewayrapid_saved_cc_type_cvv_div') && $('ewayrapid_saved_cc_type_cvv_div').hide();
+        $('ewayrapid_saved_edit') && $('ewayrapid_saved_edit').hide();
+        $$('.element_save_creditcard').each(function(el) {
+            el.hide();
+        });
+    } else if((_defaultLabel == "" || _defaultLabel == null) && _tokenCount < 2) {
+        addNew();
+    } else {
+        $$('.element_save_creditcard').each(function(el) {
+            el.hide();
+        });
+    }
+
+    $$('#payment_form_<?php echo $_code ?> .radio').each(function (el) {
+        var _rel = $(el).readAttribute('rel');
+        //console.log(_rel);
+        if (_rel != '' && _rel != null) {
+            $(el).observe('click', function () {
+                $$('.ul-form-list').each(function (rd) {
+                    rd.hide();
+                });
+                $(_rel) && $(_rel).show();
+                $(_rel) && $(_rel).firstElementChild.show();
+            });
+        }
+    });
+
+    $('ewayrapid_saved_edit') && $('ewayrapid_saved_edit').observe('click', function (elment) {
+        //console.log('Edit click: ' + this.innerHTML);
+        $('p_method_ewayrapid_saved_mastercard') && ($('p_method_ewayrapid_saved_mastercard').checked = true);
+        $('p_method_ewayrapid_saved_transparent_paypal') && ($('p_method_ewayrapid_saved_transparent_paypal').checked = false);
+        $('p_method_ewayrapid_transparent_masterpass') && ($('p_method_ewayrapid_transparent_masterpass').checked = false);
+
+        $('ul_payment_form_ewayrapid_saved') && $('ul_payment_form_ewayrapid_saved').show();
+        $('ewayrapid_saved_cc_type_cvv_div') && $('ewayrapid_saved_cc_type_cvv_div').show();
+        if (this.innerHTML == "Edit") {
+            $('eway_save_masterpass') && $('eway_save_masterpass').hide();
+            $('eway_save_paypal') && $('eway_save_paypal').hide();
+
+            $$('.element_save_creditcard').each(function(el) {
+                el.hide();
+            });
+        } else {
+            $('eway_save_masterpass') && $('eway_save_masterpass').hide(150);
+            $('eway_save_paypal') && $('eway_save_paypal').hide(150);
+
+            $('ul_payment_form_<?php echo $_code ?>') && $('ul_payment_form_<?php echo $_code ?>').show(150);
+
+            $$('.element_save_creditcard').each(function(el) {
+                el.show();
+            });
+        }
+    });
+
+    $('ewayrapid_saved_token').observe('change', function () {
+        //console.log('Value: ' + this.getValue());
+        var _ctype = $('ewayrapid_saved_token')[this.selectedIndex].readAttribute('rel');
+        //console.log(_ctype);
+        if (this.getValue() == 'new') {
+            addNew();
+        } else {
+            edit(_ctype);
+        }
+    });
+
+    function addNew() {
+        $('<?php echo $_code ?>_cc_number') && $('<?php echo $_code ?>_cc_number').writeAttribute('disabled', false);
+        $('eway_save_masterpass') && $('eway_save_masterpass').show(150);
+        $('eway_save_paypal') && $('eway_save_paypal').show(150);
+        $('ul_payment_form_<?php echo $_code ?>') && $('ul_payment_form_<?php echo $_code ?>').show(150);
+
+        $('ewayrapid_saved_edit') && $('ewayrapid_saved_edit').hide();
+
+        $$('.element_save_creditcard').each(function(el) {
+            el.show();
+        });
+        $('ul_payment_form_ewayrapid_saved') && $('ul_payment_form_ewayrapid_saved').show();
+        $('ewayrapid_saved_cc_type_cvv_div') && $('ewayrapid_saved_cc_type_cvv_div').show();
+    }
+
+    function edit(_ctype) {
+        $$('.element_save_creditcard').each(function(el) {
+            el.hide();
+        });
+
+        $('eway_save_masterpass') && $('eway_save_masterpass').hide();
+        $('eway_save_paypal') && $('eway_save_paypal').hide();
+        $('<?php echo $_code ?>_cc_number') && $('<?php echo $_code ?>_cc_number').writeAttribute('disabled', 'disabled');
+
+
+        if('<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>' != _ctype) {
+            $('ewayrapid_saved_cc_type_cvv_div') && $('ewayrapid_saved_cc_type_cvv_div').hide();
+            $('ewayrapid_saved_edit') && $('ewayrapid_saved_edit').hide();
+        } else {
+            $('p_method_ewayrapid_saved_mastercard') && ($('p_method_ewayrapid_saved_mastercard').checked = true);
+            $('p_method_ewayrapid_saved_transparent_paypal') && ($('p_method_ewayrapid_saved_transparent_paypal').checked = false);
+            $('p_method_ewayrapid_transparent_masterpass') && ($('p_method_ewayrapid_transparent_masterpass').checked = false);
+
+            $('ul_payment_form_ewayrapid_saved') && $('ul_payment_form_ewayrapid_saved').show();
+            $('ewayrapid_saved_cc_type_cvv_div') && $('ewayrapid_saved_cc_type_cvv_div').show();
+            $('ewayrapid_saved_edit') && $('ewayrapid_saved_edit').show();
+        }
+    }
+
+    setInterval(function(){
+        if(_saved == 1) return false;
+        _saved = 1;
+        $$('#payment_form_ewayrapid_saved .radio:checked').each(function(rd) {
+            if(rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>') {
+                $('ul_payment_form_<?php echo $_code ?>').show();
+            } else if(rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD ?>'
+                || rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::MASTERPASS_METHOD ?>') {
+                $('ul_payment_form_<?php echo $_code ?>').hide();
+            } else {
+                $('ul_payment_form_<?php echo $_code ?>').show();
+            }
+        });
+    },300);
+</script>
+
+<script type="text/javascript">
+    $('p_method_ewayrapid_saved').observe('click', function () {
+        $('p_method_ewayrapid_saved').setAttribute('checked', 'true');
+        $('p_method_ewayrapid_notsaved').removeAttribute('checked');
+        $('ul-eway-saved-div-box').show();
+        $$('#payment_form_ewayrapid_saved input[name*=payment]').each(function(inp) {
+            inp.removeAttribute('disabled');
+        });
+        $$('#payment_form_ewayrapid_saved select[name*=payment]').each(function(inp) {
+            inp.removeAttribute('disabled');
+        });
+    });
+</script>
