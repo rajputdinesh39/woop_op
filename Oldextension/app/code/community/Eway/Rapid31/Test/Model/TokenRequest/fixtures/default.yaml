@@ -1,0 +1,6 @@
+config:
+  stores/admin/payment/ewayrapid_general/sandbox_api_key: 'cZpDMzAhynZo3f4RIwTmRWEXU0ZixvZbvM/GVbgIpzieoaip0XZ/dYji6A/MIgBPYnvldWHP+E+VGPLzAYQxfczBMfT6QhIX'
+  stores/admin/payment/ewayrapid_general/sandbox_api_password: 'NxVgbCAnIJw='
+  stores/admin/payment/ewayrapid_general/debug: 1
+  stores/admin/payment/ewayrapid_general/mode: 'sandbox'
+  stores/admin/payment/ewayrapid_general/ssl_verification: 0

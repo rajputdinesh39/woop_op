@@ -1,0 +1,55 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     default_default
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+$_helper = Mage::helper('ewayrapid');
+/* @var Eway_Rapid31_Block_Info_Direct_Notsaved $this */
+$_info = $this->getInfo();
+/* @var Mage_Sales_Model_Order_Payment $_info */
+
+?>
+
+
+<?php echo $this->getMethod()->getTitle() ?>{{pdf_row_separator}}
+<?php if($_info->getCcOwner()): ?>
+<?php echo $_helper->__('Card Holder\'s Name') ?>: <?php echo $_info->getCcOwner(); ?>{{pdf_row_separator}}
+<?php endif; ?>
+
+<?php if($_info->getCcLast4()): ?>
+<?php echo $_helper->__('Credit Card Number') ?>: <?php echo str_pad($_info->getCcLast4(), 16, '*', STR_PAD_LEFT); ?>{{pdf_row_separator}}
+<?php endif; ?>
+
+<?php if($_info->getCcExpMonth()): ?>
+<?php echo $_helper->__('Credit Card Expiry') ?>: <?php echo str_pad($_info->getCcExpMonth(), 2, '0', STR_PAD_LEFT); ?> / <?php echo $_info->getCcExpYear() ?>{{pdf_row_separator}}
+<?php endif; ?>
+
+<?php if($_info->getCcType()): ?>
+<?php echo $_helper->__('Credit Card Type') ?>: <?php echo $this->getCcTypeName($_info->getCcType()); ?>{{pdf_row_separator}}
+<?php endif; ?>
+
+<?php if($_info->getLastTransId()): ?>
+<?php echo $_helper->__('Last Transaction ID') ?>: <?php echo $_info->getLastTransId(); ?>{{pdf_row_separator}}
+<?php endif; ?>

@@ -1,0 +1,173 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+$_code = $this->getMethodCode();
+$userLogger = Mage::getSingleton('customer/session')->isLoggedIn();
+?>
+
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display: none">
+    <?php if($this->checkSaveCardAvailable()): ?>
+        <?php
+            $_tokens = $this->getTokenList();
+            $_defaultToken = isset($_tokens['default_token']) ? $_tokens['default_token'] : false;
+        ?>
+        <li <?php echo count($_tokens['tokens']) <= 1 ? 'style="display:none;"' : '' ?>>
+            <div class="input-box">
+                <div class="v-fix">
+                    <select id="ewayrapid_ewayone_token" name="payment[saved_token]" class="ewayrapid_ewayone_token">
+                        <?php foreach($_tokens['tokens'] as $_key => $_token):
+                            if ($_key == Eway_Rapid31_Model_Config::TOKEN_NEW || $this->checkCardName($_token) == Eway_Rapid31_Model_Config::CREDITCARD_METHOD): ?>
+                            <?php /* @var Eway_Rapid31_Model_Customer_Token $_token */ ?>
+                            <option value="<?php echo $_key ?>" <?php if($_key == $_defaultToken): ?>selected="selected"<?php endif; ?>>
+                                <?php echo $_token->getCard() ?>
+                            </option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php if(Mage::getSingleton('ewayrapid/config')->canEditToken() && count($_tokens['tokens']) > 1): ?>
+                    <div class="v-fix">
+                        <a id="ewayrapid_ewayone_edit" class="ewayrapid_ewayone_edit" href="javascript:void(0);"><?php echo $this->__('Edit') ?></a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </li>
+    <?php endif; ?>
+    <li <?php echo $userLogger ? 'class="saved_token_fields" style="display: none"' :'' ?>>
+        <label for="eway-secure-field-name" class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
+        <div id="eway-secure-field-name" class="secure-form-input secure-form-name"></div>
+        <div id="eway-secure-field-name-error" class="secure-form-error" style="display: none"><?php echo $this->__('Invalid Name on Card') ?></div>
+    </li>
+    <li <?php echo $userLogger ? 'class="saved_token_fields" style="display: none"' :'' ?>>
+        <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
+        <div class="input-box help-disabled-cc">
+            <div id="eway-secure-field-card-edit" class="secure-form-input secure-form-card" style="display: none">
+                <input id="eway-secure-field-card-edit-input" type="text" disabled="disabled" value="444433******1111">
+            </div>
+            <div id="eway-secure-field-card" class="secure-form-input secure-form-card"></div>
+            <div id="eway-secure-field-card-error" class="secure-form-error" style="display: none"><?php echo $this->__('Invalid Card Number') ?></div>
+            <?php if($userLogger): ?>
+            <a class="card-number-help" href="#"><?php echo $this->__('Help') ?></a>
+            <div class="tool-tip" id="cc-help-tool-tip" style="display:none;">
+                <div class="btn-close"><a href="#" id="cc-help-tool-tip-close" title="<?php echo $this->__('Close') ?>"><?php echo $this->__('Close') ?></a></div>
+                <div class="tool-tip-content">To use a new credit card number, please add another card</div>
+            </div>
+            <?php endif; ?>
+        </div>
+    </li>
+    <li <?php echo $userLogger ? 'class="saved_token_fields" style="display: none"' :'' ?>>
+        <label for="eway-secure-field-expiry" class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+        <div id="eway-secure-field-expiry" class="secure-form-input secure-form-expiry"></div>
+        <div id="eway-secure-field-expiry-error" class="secure-form-error" style="display: none"><?php echo $this->__('Invalid Expiration Date') ?></div>
+    </li>
+    <?php echo $this->getChildHtml() ?>
+    <?php if($this->hasVerification()): ?>
+    <li id="<?php echo $_code ?>_cc_type_cvv_div">
+        <label for="<?php echo $_code ?>_cc_cid" class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <div id="eway-secure-field-cvn" class="secure-form-input secure-form-cvn"></div>
+            </div>
+            <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+        </div>
+        <div id="eway-secure-field-cvn-error" class="secure-form-error" style="display: none"><?php echo $this->__('Invalid Card Verification Number') ?></div>
+    </li>
+<?php if ($this->getIsRecurring()) { ?>
+    <li>
+        <p>I authorize <?php echo Mage::app()->getStore()->getName(); ?> to charge the available balance
+            in my credit card for the future payments of this order. To make a change, I can go to
+            <a href="<?php echo Mage::getUrl('checkout/cart'); ?>">Cart</a>
+        </p>
+        <input type="checkbox" name="recurring-agree" class="recurring-agree required-entry"/><label class="lable-for-recurring" for="">Agree</label>
+    </li>
+<?php } ?>
+    <?php endif; ?>
+    <?php if($this->checkSaveCardAvailable() && $this->getSaveCard()): ?>
+        <li id="eway_save_card" <?php echo $userLogger ? 'class="saved_token_fields" style="display: none"' :'' ?>>
+            <div class="v-fix">
+                <input type="checkbox" title="<?php echo $this->getSaveText() ?>" id="<?php echo $_code ?>_cc_save_card"
+                    <?php echo $this->getSaveDefaultCheck() ? 'checked' : '' ?> name="payment[save_card]" value="1" pattern="\d*"/>
+                <label for="<?php echo $_code ?>_cc_save_card" ><?php echo $this->getSaveText() ?></label>
+            </div>
+        </li>
+    <?php endif; ?>
+    <input type="hidden" id="securefieldcode" name="payment[secured_card_data]" value="" />
+    <?php if($userLogger): ?>
+        <input type="hidden" id="eway-secure-field-edit-token" name="payment[update_token]" value="" />
+    <?php endif;?>
+</ul>
+<input type="hidden" id="eway-public-api-key" value="<?php echo $this->getPublicApiKey() ?>">
+<input type="hidden" id="eway-secure-form-mask-value" value="<?php echo $this->isMaskValues() ?>">
+<input type="hidden" id="eway-secure-form-auto-complete" value="<?php echo $this->isAutoComplete() ?>">
+<?php if($userLogger): ?>
+<script type="text/javascript">
+        var ewayPaymentToken = new EwayPaymentToken(
+            <?php echo $_tokens['tokens_json'] ?>,
+            <?php echo count($_tokens['tokens']) ?>,
+            false,
+            '<?php echo $this->__('Edit') ?>',
+            '<?php echo $this->__('Cancel edit') ?>'
+        );
+
+    $$('.help-disabled-cc a').each(function(element){
+        Event.observe(element, 'click', toggleToolTipCc);
+    });
+
+    function toggleToolTipCc(event){
+        if($('cc-help-tool-tip')){
+            $('cc-help-tool-tip').toggle();
+        }
+        Event.stop(event);
+    }
+    if($('cc-help-tool-tip-close')){
+        Event.observe($('cc-help-tool-tip-close'), 'click', toggleToolTipCc);
+    }
+
+</script>
+<?php endif; ?>
+
+<script type="text/javascript">
+    $('p_method_ewayrapid_ewayone').observe('click', function () {
+        $('p_method_ewayrapid_ewayone').setAttribute('checked', 'true');
+        $('p_method_ewayrapid_notsaved') && $('p_method_ewayrapid_notsaved').removeAttribute('checked');
+
+        $$('#payment_form_ewayrapid_ewayone input[name*=payment]').each(function(inp) {
+            inp.removeAttribute('disabled');
+        });
+
+        $$('#payment_form_ewayrapid_ewayone select[name*=payment]').each(function(inp) {
+            inp.removeAttribute('disabled');
+        });
+
+        $$('#payment_form_ewayrapid_ewayone input[data-eway-encrypt-name*=payment]').each(function(inp) {
+            inp.removeAttribute('disabled');
+        });
+    });
+
+    if(typeof secureForm !== 'undefined'){
+        secureForm.setupSecureField();
+    }
+</script>

@@ -1,0 +1,76 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+$_code = $this->_methodPayment;
+if (!$_code) $_code = 'ewayrapid_notsaved';
+
+$infoCard = Mage::getSingleton('core/session')->getInfoCard();
+if (is_numeric($this->_savedToken)) {
+    $infoCardData = Mage::helper('ewayrapid/customer')->getTokenById($this->_savedToken);
+    if($infoCard->getOwner()) {
+        $infoCardData->setOwner($infoCard->getOwner());
+    }
+
+    if($infoCard->getExpMonth()) {
+        $infoCardData->setExpMonth($infoCard->getExpMonth());
+    }
+
+    if($infoCard->getExpYear()) {
+        $infoCardData->setExpYear($infoCard->getExpYear());
+    }
+
+    if($infoCard->getCid()) {
+        $infoCardData->setCid($infoCard->getCid());
+    }
+    $infoCard = $infoCardData;
+}
+
+?>
+
+<form method="POST" action="<?php echo Mage::getSingleton('core/session')->getFormActionUrl(); ?>" name="transparent_card" id="transparent_card">
+    <h4><span class="please-wait" id="payment-please-wait" style="display: block;float: left;"><img
+                src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif'); ?>" alt="Connecting..."
+                title="Connecting..." class="v-middle"> Connecting...</span></h4>
+
+    <input type="hidden" name="EWAY_ACCESSCODE" value="<?php echo $this->getAccessCode(); ?>"/>
+    <input type="hidden" name="EWAY_PAYMENTTYPE" value="<?php echo $this->_transMethod == Eway_Rapid31_Model_Config::PAYPAL_EXPRESS_METHOD ? 'paypal' : $this->_transMethod; ?>"/>
+    <input type="hidden" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry"
+           id="EWAY_CARDNAME" name="EWAY_CARDNAME"
+           value="<?php echo ($infoCard && $infoCard->getOwner()) ? $infoCard->getOwner() : '' ?>"/>
+    <input type="hidden" name="EWAY_CARDNUMBER" value="<?php echo $infoCard && $infoCard->getCardFull() ? str_replace('*', 'X', $infoCard->getCardFull()) : str_replace('*','X',$infoCard->getCard()) ?>"/>
+
+    <input type="hidden" name="EWAY_CARDEXPIRYMONTH" value="<?php echo $infoCard && $infoCard->getExpMonth() ? $infoCard->getExpMonth() : '' ?>" />
+    <input type="hidden" name="EWAY_CARDEXPIRYYEAR" value="<?php echo $infoCard && $infoCard->getExpYear() ? $infoCard->getExpYear() : '' ?>" />
+    <?php if($this->hasVerification()): ?>
+        <input type="hidden" title="<?php echo $this->__('Card Verification Number') ?>"
+               class="" id="EWAY_CARDCVN" name="EWAY_CARDCVN" value="<?php echo $infoCard && $infoCard->getCid() ? $infoCard->getCid() : '' ?>"
+            />
+    <?php endif; ?>
+</form>
+
+<script type="text/javascript">
+    document.getElementById("transparent_card").submit();
+</script>

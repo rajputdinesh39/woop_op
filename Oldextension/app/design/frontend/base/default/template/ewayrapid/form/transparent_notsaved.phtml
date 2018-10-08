@@ -1,0 +1,155 @@
+<?php
+$_code = $this->getMethodCode();
+?>
+<ul class="sp-methods" id="payment_form_<?php echo $_code ?>"
+    style="display:none; padding-left: 16px; padding-bottom: 8px; border: 1px solid rgb(193, 193, 193); float: left; width:100%;">
+
+    <li>
+        <input id="p_method_ewayrapid_transparent_mastercard"
+               value="<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>" type="radio"
+               name="payment[transparent_notsaved]" title="Check / Money order" class="radio" autocomplete="off"
+               checked="checked">
+        <label for="p_method_ewayrapid_transparent_paypalexpress">Credit Card </label>
+
+        <ul class="form-list form-list-notsaved" id="ul_payment_form_<?php echo $_code ?>" style="display: block;">
+            <li>
+                <label for="<?php echo $_code ?>_cc_owner"
+                       class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
+                <div class="input-box">
+                    <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry"
+                           id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]"
+                           value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>"/>
+                </div>
+            </li>
+            <li>
+                <label for="<?php echo $_code ?>_cc_number"
+                       class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
+
+                <div class="input-box">
+                    <input type="text" id="<?php echo $_code ?>_cc_number"
+                           name="payment[cc_number]"
+                           title="<?php echo $this->__('Credit Card Number') ?>"
+                           data-eway-encrypt-name="payment[cc_number]"
+                           class="input-text validate-cc-number validate-cc-type-auto" value="" pattern="\d*"/>
+                    <input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[cc_type]"/>
+                </div>
+            </li>
+            <li id="<?php echo $_code ?>_cc_type_exp_div">
+                <label for="<?php echo $_code ?>_expiration"
+                       class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+
+                <div class="input-box">
+                    <div class="v-fix">
+                        <select id="<?php echo $_code ?>_expiration" name="payment[cc_exp_month]"
+                                class="month validate-cc-exp required-entry">
+                            <?php $_ccExpMonth = $this->getInfoData('cc_exp_month') ?>
+                            <?php foreach ($this->getCcMonths() as $k => $v): ?>
+                                <option
+                                    value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="v-fix">
+                        <?php $_ccExpYear = $this->getInfoData('cc_exp_year') ?>
+                        <select id="<?php echo $_code ?>_expiration_yr" name="payment[cc_exp_year]"
+                                class="year required-entry">
+                            <?php foreach ($this->getCcYears() as $k => $v): ?>
+                                <option
+                                    value="<?php echo $k ? $k : '' ?>"<?php if ($k == $_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                </div>
+            </li>
+            <?php echo $this->getChildHtml() ?>
+            <?php if ($this->hasVerification()): ?>
+                <li id="<?php echo $_code ?>_cc_type_cvv_div">
+                    <label for="<?php echo $_code ?>_cc_cid"
+                           class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
+
+                    <div class="input-box">
+                        <div class="v-fix" id="v-fix-cvn-id">
+                            <input type="text" title="<?php echo $this->__('Card Verification Number') ?>"
+                                   name="payment[cc_cid]"
+                                   class="input-text cvv required-entry validate-cc-cvn" id="<?php echo $_code ?>_cc_cid"
+                                   data-eway-encrypt-name="payment[cc_cid]"
+                                   value="" pattern="\d*"/>
+                        </div>
+                        <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+                    </div>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </li>
+
+    <?php if ($this->getEnablePaypalStandard()) { ?>
+        <li>
+            <input id="p_method_ewayrapid_transparent_paypal"
+                   value="<?php echo Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD ?>" type="radio"
+                   name="payment[transparent_notsaved]" title="Paypal - eWAY (not saved)" class="radio"
+                   autocomplete="off">
+            <label for="p_method_ewayrapid_transparent_paypal">Paypal Standard </label>
+        </li>
+    <?php } ?>
+
+    <?php if ($this->getEnableMasterPass() && Mage::helper('ewayrapid/data')->getPaymentAction() == Eway_Rapid31_Model_Method_Notsaved::ACTION_AUTHORIZE_CAPTURE) { ?>
+        <li>
+            <input id="p_method_ewayrapid_transparent_masterpass"
+                   value="<?php echo Eway_Rapid31_Model_Config::MASTERPASS_METHOD ?>" type="radio"
+                   name="payment[transparent_notsaved]" title="MasterPass - eWAY (not saved)"
+                   class="radio validate-one-required-by-name"
+                   autocomplete="off" />
+            <label for="p_method_ewayrapid_transparent_masterpass">MasterPass </label>
+        </li>
+    <?php } ?>
+</ul>
+
+<script>
+    var _notSaved  = 0;
+    $('p_method_<?php echo $_code ?>').observe('click', function(){
+        $('ul_payment_form_<?php echo $_code ?>').show();
+    });
+
+    setInterval(function(){
+        if(_notSaved == 1) return false;
+        _notSaved = 1;
+        $$('#payment_form_ewayrapid_notsaved .radio:checked').each(function(rd) {
+            if(rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>') {
+                $('ul_payment_form_<?php echo $_code ?>').show();
+            } else if(rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD ?>'
+                || rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::MASTERPASS_METHOD ?>') {
+                $('ul_payment_form_<?php echo $_code ?>').hide();
+            } else {
+                $('ul_payment_form_<?php echo $_code ?>').show();
+            }
+        });
+    },300);
+
+    $$('#payment_form_<?php echo $_code ?> .radio').each(function(rd) {
+        rd.observe('click', function(el) {
+            console.log(rd.getValue());
+            if(rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>') {
+                $('ul_payment_form_<?php echo $_code ?>').show();
+            } else if(rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD ?>'
+                || rd.getValue() == '<?php echo Eway_Rapid31_Model_Config::MASTERPASS_METHOD ?>') {
+                $('ul_payment_form_<?php echo $_code ?>').hide();
+            } else {
+                $('ul_payment_form_<?php echo $_code ?>').show();
+            }
+        });
+    });
+
+</script>
+
+<script>
+    $('p_method_ewayrapid_notsaved').observe('click', function () {
+        $('p_method_ewayrapid_notsaved').setAttribute('checked', 'true');
+        $('p_method_ewayrapid_saved') && $('p_method_ewayrapid_saved').removeAttribute('checked');
+        $$('#payment_form_ewayrapid_notsaved input[name*=payment]').each(function(inp) {
+            inp.removeAttribute('disabled');
+        });
+        $$('#payment_form_ewayrapid_notsaved select[name*=payment]').each(function(inp) {
+            inp.removeAttribute('disabled');
+        });
+    });
+</script>

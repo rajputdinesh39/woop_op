@@ -1,0 +1,842 @@
+<?php /** @var \Eway_Rapid31_Model_Config $_config */
+$_config = Mage::getSingleton('ewayrapid/config'); ?>
+<?php $_backend = Mage::helper('ewayrapid')->isBackendOrder(); ?>
+<?php $_checkoutExtension = $this->getCheckoutExtension(); ?>
+<?php $_mageworld = Mage::helper('core')->isModuleEnabled('MW_Onestepcheckout'); ?>
+<?php $_backendIFrame = $_config->isSharedPageConnection() || $_config->isRapidIframeConnection()?>
+<?php if ($_config->isDirectConnection() || $_backend): ?>
+    <script type="text/javascript">
+        EwayPayment.supportCardTypes = <?php echo json_encode($_config->getSupportedCardTypes()) ?>;
+        <?php if(Mage::helper('ewayrapid')->isBackendOrder()): ?>
+        var ewayPayment = new EwayPayment($('edit_form'), '<?php echo $_config->getEncryptionKey() ?>');
+        if(typeof AdminOrder === 'function'){
+            AdminOrder.prototype.submit = ewayPayment.submitAdminOrder;
+        }
+        <?php else: ?>
+        <?php switch($_checkoutExtension):
+            case 'OneStepCheckout': // OneStepCheckout extension ?>
+        document.observe("dom:loaded", function () {
+
+            <?php if(Mage::getStoreConfig('onestepcheckout/general/rewrite_checkout_links')): ?>
+            var ewayPayment = new EwayPayment($('onestepcheckout-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (ewayPayment && $('onestepcheckout-form')) {
+                Payment.prototype.switchMethod = ewayPayment.OneStepCheckout.switchMethod;
+                if (payment.currentMethod) {
+                    payment.switchMethod(payment.currentMethod);
+                }
+            }
+
+            $('onestepcheckout-form') && ($('onestepcheckout-form').submit = function () {
+                eCrypt.submitForm();
+            });
+            <?php endif; ?>
+
+            <?php if(Mage::getStoreConfig('onestepcheckout/general/active')): ?>
+            var ewayPayment2 = new EwayPayment($('one-step-checkout-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (ewayPayment2 && $('one-step-checkout-form'))
+                Payment.prototype.switchMethod = ewayPayment2.OneStepCheckout.switchMethod;
+
+            $('one-step-checkout-form') && ($('one-step-checkout-form').submit = function () {
+                eCrypt.submitForm();
+            });
+            <?php endif; ?>
+
+        });
+        <?php break; ?>
+
+        <?php case 'LightCheckout': ?>
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment($('gcheckout-onepage-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (typeof checkout.LightcheckoutSubmitOld == "undefined") {
+                checkout.LightcheckoutSubmitOld = checkout.LightcheckoutSubmit;
+                checkout.LightcheckoutSubmit = ewayPayment.Lightcheckout.LightcheckoutSubmit;
+                checkout.getFormData = ewayPayment.Lightcheckout.getFormData;
+            }
+        });
+        <?php break; ?>
+
+        <?php case 'FireCheckout': // FireCheckout extension ?>
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment($('firecheckout-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (typeof FireCheckout.prototype.ewayOldSave == "undefined") {
+                FireCheckout.prototype.ewayOldSave = FireCheckout.prototype.save;
+                FireCheckout.prototype.save = ewayPayment.FireCheckout.save;
+            }
+        });
+        <?php break; ?>
+        <?php case 'IWDOnePageCheckout': // IWD OnePageCheckout extension ?>
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment($('co-payment-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (typeof IWD.OPC.ewayOldSavePayment == "undefined") {
+                IWD.OPC.ewayOldSavePayment = IWD.OPC.savePayment;
+                IWD.OPC.ewayOldSaveOrder = IWD.OPC.saveOrder;
+                IWD.OPC.savePayment = ewayPayment.IWDOnePageCheckout.savePayment;
+                IWD.OPC.saveOrder = ewayPayment.IWDOnePageCheckout.saveOrder;
+            }
+        });
+        <?php break; ?>
+        <?php case 'MultiShippingAddress': // Magento default multi shipping address ?>
+        var ewayPayment = new EwayPayment($('multishipping-billing-form'), '<?php echo $_config->getEncryptionKey() ?>');
+        $('multishipping-billing-form').onsubmit = ewayPayment.MultiShipping.submit;
+        <?php break; ?>
+        <?php default: // Magento default one page checkout ?>
+        var ewayPayment = new EwayPayment($('co-payment-form'), '<?php echo $_config->getEncryptionKey() ?>');
+        
+        if (typeof (ewayPayment.ewaysavedOldOrder) == "undefined") {
+            ewayPayment.ewaysavedOldOrder = Review.prototype.save;
+        }
+        
+        Payment.prototype.save = ewayPayment.savePaymentWithEncryption;
+        Review.prototype.save = ewayPayment.saveReviewWithEncryption;
+        
+        document.observe("dom:loaded", function () {
+            window.onload = function(){
+            // MageWorld One Step Checkout Pro
+            if(typeof $MW_Onestepcheckout != 'undefined') {
+                $MW_Onestepcheckout('.btn-checkout').die('click');
+                $MW_Onestepcheckout('.btn-checkout').live("click",function(e){
+                    var ewayPayment = new EwayPayment($('onestep_form'), '<?php echo $_config->getEncryptionKey() ?>');
+                    <?php if($_mageworld && Mage::helper('onestepcheckout')->onlyProductDownloadable()):?>
+                        var notshipmethod=1;
+                    <?php else:?>
+                        var notshipmethod=$MW_Onestepcheckout("input[name=shipping_method]:checked").val();
+                    <?php endif?>
+                    ewayPayment.MageWorld.submit(e, notshipmethod, false);
+                });
+            }
+            }
+        });
+        <?php endswitch; ?>
+        <?php endif; ?>
+    </script>
+<?php endif; ?>
+
+<?php if ($_config->isTransparentConnection() && !$_backend): ?>
+    <?php if($_config->getVisaCheckoutEnable()): ?>
+        <img id="visa_checkout_button" class="v-button" role="button" tabindex="0" style="display: none"
+             src="https://<?php echo $_config->isSandbox() ? 'sandbox.' : '' ?>secure.checkout.visa.com/wallet-services-web/xo/button.png"/>
+        <script type="text/javascript"
+                src="<?php echo $_config->getVisaCheckoutSDK() ?>">
+        </script>
+        <script type="text/javascript">
+            function onVisaCheckoutReady(){
+                V.init({apikey: "<?php echo $_config->getVisaCheckoutApiKey() ?>"});
+                V.on("payment.success", function(payment){updateVisaCheckoutCallback(payment)});
+                V.on("payment.cancel", function(payment){updateVisaCheckoutCallback(payment)});
+                V.on("payment.error", function(payment, error){updateVisaCheckoutCallback(payment, error)});
+            }
+
+            function updateVisaCheckoutCallback(result, error){
+                if(error){
+                    alert(error);
+                    $('review-please-wait') && $('review-please-wait').show();
+                }
+                if(result && result.callid && result.encPaymentData){
+                    $('visa_checkout_call_id').value = result.callid;
+                    //payment.save();
+                    ewayPayment.saveReviewWithEncryptionTrans();
+                }else{
+                    $('review-please-wait') && $('review-please-wait').hide();
+                    $('review-buttons-container') && $('review-buttons-container').down('button').show();
+                }
+            }
+        </script>
+    <?php endif; ?>
+    <?php if($_checkoutExtension) {
+        Mage::getSingleton('core/session')->setCheckoutExtension($_checkoutExtension);
+    } else {
+        Mage::getSingleton('core/session')->unsCheckoutExtension();
+    }?>
+    <script type="text/javascript">
+        var creditcard = '<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>';
+
+        <?php switch($_checkoutExtension):
+                case 'OneStepCheckout': // OneStepCheckout extension ?>
+        <?php if(Mage::getStoreConfig('onestepcheckout/general/rewrite_checkout_links')): ?>
+
+            function updateVisaCheckoutCallback(result, error){
+                if(error){
+                    alert(error);
+                    $('review-please-wait') && $('review-please-wait').show();
+                }
+                if(result && result.callid && result.encPaymentData){
+                    $('visa_checkout_call_id').value = result.callid;
+                    eCrypt.submitForm();
+                }else{
+                    already_placing_order = false;
+                    var submitelement = $('onestepcheckout-place-order');
+
+                    $$('.onestepcheckout-place-order-loading').first() && $$('.onestepcheckout-place-order-loading').first().remove();
+                    submitelement.addClassName('orange').removeClassName('grey');
+                    submitelement.disabled = false;
+                }
+            };
+
+            document.observe("dom:loaded", function () {
+                var ewayPayment = new EwayPayment($('onestepcheckout-form'), '<?php echo $_config->getEncryptionKey() ?>');
+                Payment.prototype.switchMethod = ewayPayment.OneStepCheckout.switchMethod;
+                if (payment.currentMethod) {
+                    payment.switchMethod(payment.currentMethod);
+                }
+
+                $('onestepcheckout-form') && ($('onestepcheckout-form').submit = function () {
+                    if($('p_method_ewayrapid_transparent_visa') && $('p_method_ewayrapid_transparent_visa').checked){
+                        if(!$('visa_checkout_call_id').value){
+                            document.getElementById('visa_checkout_button').click();
+                            return;
+                        }
+                    }
+                    eCrypt.submitForm();
+                });
+
+                if ($('onestepcheckout-form')) {
+                    $('ewayrapid_notsaved_expiration') && $('ewayrapid_notsaved_expiration').writeAttribute('style', 'width:103px !important;');
+                    $('ewayrapid_ewayone_expiration') &&  $('ewayrapid_ewayone_expiration').writeAttribute('style', 'width:103px !important;');
+                    //$('ewayrapid_ewayone_token') && $('ewayrapid_ewayone_token').writeAttribute('style', 'width:128px !important;');
+                    $('v-fix-change') && $('v-fix-change').writeAttribute('style', 'width:60px !important;');
+                    $('v-fix-cvn-id') && $('v-fix-cvn-id').writeAttribute('style', 'width:60px !important;');
+
+                    $('ul_payment_form_ewayrapid_notsaved') && $('ul_payment_form_ewayrapid_notsaved').setStyle({'margin-left': '-2px'});
+                    $('ul_payment_form_ewayrapid_ewayone') && $('ul_payment_form_ewayrapid_ewayone').setStyle({'margin-left': '-2px'});
+                    $('ul-eway-saved-div-box') && $('ul-eway-saved-div-box').setStyle({'margin-left': '-2px'});
+                    $$('#container_payment_method_ewayrapid_notsaved ul li').each(function (element) {
+                        element.writeAttribute('style', 'float: left; width: 100%');
+                    });
+                }
+            });
+            <?php endif; ?>
+
+        <?php if(Mage::getStoreConfig('onestepcheckout/general/active')): ?>
+            function updateVisaCheckoutCallback(result, error){
+                if(error){
+                    alert(error);
+                    $('review-please-wait') && $('review-please-wait').show();
+                }
+                if(result && result.callid && result.encPaymentData){
+                    $('visa_checkout_call_id').value = result.callid;
+                    $('one-step-checkout-form').submit();
+                }else{
+                    $('onestepcheckout-place-order-loading').hide();
+                    $('onestepcheckout-button-place-order').addClassName('onestepcheckout-btn-checkout');
+                    $('onestepcheckout-button-place-order').removeClassName('place-order-loader');
+                }
+            }
+
+            document.observe("dom:loaded", function () {
+                var ewayPayment2 = new EwayPayment($('one-step-checkout-form'), '<?php echo $_config->getEncryptionKey() ?>');
+                if (ewayPayment2 && $('one-step-checkout-form')){
+                    Payment.prototype.switchMethod = ewayPayment2.OneStepCheckout.switchMethod;
+                }
+                function oscPlaceOrder(element) {
+                    var validator = new Validation('one-step-checkout-form');
+                    var form = $('one-step-checkout-form');
+                    if (validator.validate()) {
+                        if ($('p_method_ewayrapid_transparent_visa') && $('p_method_ewayrapid_transparent_visa').checked) {
+                            if (!$('visa_checkout_call_id').value) {
+                                document.getElementById('visa_checkout_button').click();
+                                return;
+                            }
+                        }
+                        if (($('p_method_hosted_pro') && $('p_method_hosted_pro').checked) || ($('p_method_payflow_advanced') && $('p_method_payflow_advanced').checked)) {
+                            $('onestepcheckout-place-order-loading').show();
+                            $('onestepcheckout-button-place-order').removeClassName('onestepcheckout-btn-checkout');
+                            $('onestepcheckout-button-place-order').addClassName('place-order-loader');
+                            $('ajaxcart-load-ajax').show();
+                            checkAjax('<?php echo $this->getUrl('onestepcheckout/index/saveOrderPro', array('_secure' => true)); ?>');
+                        } else {
+                            if (checkpayment()) {
+                                element.disabled = true;
+                                var already_placing_order = true;
+                                disable_payment();
+                                $('onestepcheckout-place-order-loading').show();
+                                $('onestepcheckout-button-place-order').removeClassName('onestepcheckout-btn-checkout');
+                                $('onestepcheckout-button-place-order').addClassName('place-order-loader');
+                                //$('one-step-checkout-form').submit();
+                                var options = document.getElementsByName('payment[method]');
+                                for (var i = 0; i < options.length; i++) {
+                                    if ($(options[i].id).checked) {
+                                        if (options[i].id.indexOf("tco") != -1) {
+                                            var params = Form.serialize('one-step-checkout-form');
+                                            var request = new Ajax.Request(
+                                                '<?php echo $this->getCheckoutUrl() . 'isAjax/tco'; ?>',
+                                                {
+                                                    method: 'post',
+                                                    onComplete: this.onComplete,
+                                                    onSuccess: function(transport) {
+                                                        if (transport.status == 200) {
+                                                            if (transport.responseText.isJSON) {
+                                                                var response = JSON.parse(transport.responseText);
+                                                                $('onestepcheckout-place-order-loading').style.display = 'none';
+                                                                $('checkout-' + response.update_section.name + '-load').update(response.update_section.html);
+                                                                $('onestepcheckout-button-place-order').removeAttribute('onclick');
+                                                                $('onestepcheckout-button-place-order').observe('click', formsubmit());
+                                                                $('onestepcheckout-button-place-order').disabled = false;
+                                                            }
+                                                        }
+                                                    },
+                                                    onFailure: '', //checkout.ajaxFailure.bind(checkout),
+                                                    parameters: params
+                                                });
+                                        } else if (options[i].id.indexOf("wirecard") != -1) {
+                                            var params = Form.serialize('one-step-checkout-form');
+                                            var request = new Ajax.Request(
+                                                '<?php echo $this->getCheckoutUrl() . 'isAjax/wirecard'; ?>',
+                                                {
+                                                    method: 'post',
+                                                    onComplete: this.onComplete,
+                                                    onSuccess: function(transport) {
+                                                        var response = JSON.parse(transport.responseText);
+                                                        if (response.url) {
+                                                            window.location.href = response.url;
+                                                        } else {
+                                                            var payment_method = $RF(form, 'payment[method]');
+                                                            var wireparams = {'paymentMethod': payment_method};
+                                                            url = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true) . 'wirecard_checkout_page/processing/wirecard_checkout_pagecheckout/'; ?>';
+                                                            var wirerequest = new Ajax.Request(
+                                                                qmoreIsIframe,
+                                                                {
+                                                                    method: 'get',
+                                                                    parameters: wireparams,
+                                                                    onSuccess: function(innerTransport) {
+                                                                        if (innerTransport && innerTransport.responseText) {
+                                                                            try {
+                                                                                var innerResponse = eval('(' + innerTransport.responseText + ')');
+                                                                            }
+                                                                            catch (e) {
+                                                                                innerResponse = {};
+                                                                            }
+                                                                            if (innerResponse.isIframe)
+                                                                            {
+                                                                                toggleQMoreIFrame();
+                                                                                $('qmore-iframe').src = url;
+                                                                            } else {
+                                                                                window.location.href = url;
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    onFailure: ''
+                                                                });
+                                                        }
+                                                    },
+                                                    onFailure: '', //checkout.ajaxFailure.bind(checkout),
+                                                    parameters: params
+                                                });
+                                        } else {
+                                            $('one-step-checkout-form').submit();
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                $('one-step-checkout-form') && ($('one-step-checkout-form').submit = function () {
+                    if($('p_method_ewayrapid_transparent_visa') && $('p_method_ewayrapid_transparent_visa').checked){
+                        if(!$('visa_checkout_call_id').value){
+                            document.getElementById('visa_checkout_button').click();
+                            return;
+                        }
+                    }
+                    eCrypt.submitForm();
+                });
+            });
+
+        <?php endif; ?>
+
+        <?php break; ?>
+
+        <?php case 'LightCheckout': ?>
+        function updateVisaCheckoutCallback(result, error){
+            if(error){
+                alert(error);
+                $('review-please-wait') && $('review-please-wait').show();
+            }
+            if(result && result.callid && result.encPaymentData){
+
+                $('visa_checkout_call_id').value = result.callid;
+                checkout.showLoadinfo();
+                checkout.hideLoadinfo();
+                checkout.setLoadWaiting(false);
+                checkout.LightcheckoutSubmit();
+            }else{
+                checkout.setLoadWaiting(false);
+                checkout.showLoadinfo();
+                checkout.hideLoadinfo();
+                $('review-please-wait').hide();
+            }
+        }
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment($('gcheckout-onepage-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (typeof checkout.LightcheckoutSubmitOld == "undefined") {
+                checkout.LightcheckoutSubmitOld = checkout.LightcheckoutSubmit;
+                checkout.LightcheckoutSubmit = ewayPayment.Lightcheckout.LightcheckoutSubmit;
+                checkout.getFormData = ewayPayment.Lightcheckout.getFormData;
+            }
+        });
+        <?php break; ?>
+
+
+        <?php case 'FireCheckout': // FireCheckout extension ?>
+        function updateVisaCheckoutCallback(result, error){
+            if(error){
+                alert(error);
+                $('review-please-wait') && $('review-please-wait').show();
+            }
+            if(result && result.callid && result.encPaymentData){
+
+                $('visa_checkout_call_id').value = result.callid;
+                checkout.setLoadWaiting(false);
+                checkout.save();
+            }else{
+                checkout.setLoadWaiting(false);
+                $('review-please-wait').hide();
+            }
+        }
+
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment($('firecheckout-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (typeof FireCheckout.prototype.ewayOldSave == "undefined") {
+                FireCheckout.prototype.ewayOldSave = FireCheckout.prototype.save;
+                FireCheckout.prototype.save = ewayPayment.FireCheckout.savePayment;
+            }
+        });
+        <?php break; ?>
+        <?php case 'IWDOnePageCheckout': // IWDOnePageCheckout extension ?>
+        function updateVisaCheckoutCallback(result, error){
+            if(error){
+                alert(error);
+                $('review-please-wait') && $('review-please-wait').show();
+            }
+            if(result && result.callid && result.encPaymentData){
+                $('visa_checkout_call_id').value = result.callid;
+                IWD.OPC.savePayment();
+            }else{
+                IWD.OPC.Checkout.hideLoader();
+                IWD.OPC.Checkout.unlockPlaceOrder();
+            }
+        }
+
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment($('co-payment-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (typeof IWD.OPC.ewayOldSavePayment == "undefined") {
+                IWD.OPC.ewayOldSavePayment = IWD.OPC.savePayment;
+                IWD.OPC.savePayment = ewayPayment.IWDOnePageCheckout.savePaymentTrans;
+            }
+        });
+        <?php break; ?>
+        <?php case 'MultiShippingAddress': // Magento default multi shipping address ?>
+        var ewayPayment = new EwayPayment($('multishipping-billing-form'), '<?php echo $_config->getEncryptionKey() ?>');
+        <?php break; ?>
+
+        <?php default: // Magento default one page checkout ?>
+        var ewayPayment = new EwayPayment($('co-payment-form'), '<?php echo $_config->getEncryptionKey() ?>');
+
+        if (typeof (ewayPayment.ewaypaymentOldOrder) == "undefined") {
+            ewayPayment.ewaypaymentOldOrder = Payment.prototype.save;
+        }
+        Payment.prototype.save = ewayPayment.savePaymentWithTransEncryption;
+
+        if (typeof (ewayPayment.ewaysavedOldOrder) == "undefined") {
+            ewayPayment.ewaysavedOldOrder = Review.prototype.save;
+        }
+        ewayPayment.paymentUrl = "<?php echo Mage::getUrl('ewayrapid/transparent/build', array('_secure'=>true)); ?>";
+        Review.prototype.save = ewayPayment.saveReviewWithEncryptionTrans;
+
+        function updateVisaCheckoutCallback(result, error){
+            if(error){
+                alert(error);
+                $('review-please-wait') && $('review-please-wait').show();
+            }
+            if(result && result.callid && result.encPaymentData){
+                $('visa_checkout_call_id').value = result.callid;
+                if(typeof $MW_Onestepcheckout != 'undefined') {
+                    //MageWord One Step Checkout
+                    $MW_Onestepcheckout('.btn-checkout').click();
+                }else{
+                    //Default Magento Onepage checkout
+                    ewayPayment.saveReviewWithEncryptionTrans();
+                }
+            }else{
+                $('review-please-wait') && $('review-please-wait').hide();
+                $('review-buttons-container') && $('review-buttons-container').down('button').show();
+            }
+        }
+
+        document.observe("dom:loaded", function () {
+            window.onload = function(){
+            // MageWorld One Step Checkout Pro
+            if(typeof $MW_Onestepcheckout != 'undefined') {
+
+                $('payment_form_ewayrapid_notsaved') && $('payment_form_ewayrapid_notsaved').setStyle({'width': '90%'});
+                $('payment_form_ewayrapid_ewayone') &&  $('payment_form_ewayrapid_ewayone').setStyle({'width': '90%'});
+                $('ul_payment_form_ewayrapid_notsaved') && $('ul_payment_form_ewayrapid_notsaved').setStyle({'margin-left': '-2px'});
+                $('ul_payment_form_ewayrapid_ewayone') && $('ul_payment_form_ewayrapid_ewayone').setStyle({'margin-left': '-2px'});
+                $('payment_form_ewayrapid_ewayone') && $('payment_form_ewayrapid_ewayone').setStyle({'margin-left': '-2px'});
+                $('ul-eway-saved-div-box') && $('ul-eway-saved-div-box').setStyle({'margin-left': '-2px'});
+
+                $('ewayrapid_notsaved_expiration') && $('ewayrapid_notsaved_expiration').writeAttribute('style', 'width:103px !important;');
+                $('ewayrapid_ewayone_expiration') &&  $('ewayrapid_ewayone_expiration').writeAttribute('style', 'width:103px !important;');
+                //$('ewayrapid_ewayone_token') && $('ewayrapid_ewayone_token').writeAttribute('style', 'width:128px !important;');
+
+                $('ewayrapid_notsaved_cc_type_cvv_div') && $$('#ewayrapid_notsaved_cc_type_cvv_div div.v-fix')[0].writeAttribute('style', 'width: 35% !important');
+                $('ewayrapid_ewayone_cc_type_cvv_div') && $$('#ewayrapid_ewayone_cc_type_cvv_div div.v-fix')[0].writeAttribute('style', 'width: 35% !important');
+
+                $$('#ul_payment_form_ewayrapid_notsaved input[type=text]').each(function (element) {
+                    element.writeAttribute('style', 'width: 80% !important;');
+                });
+
+                $('ul_payment_form_ewayrapid_ewayone') && $$('#ul_payment_form_ewayrapid_ewayone input[type=text]').each(function (element) {
+                    element.writeAttribute('style', 'width: 80% !important;');
+                });
+
+                $MW_Onestepcheckout('.btn-checkout').die('click');
+                $MW_Onestepcheckout('.btn-checkout').live("click",function(e){
+                    alert('Transparent Redirect is not supported with MageWorld One Step Checkout Pro.');
+                    return false;
+                    var ewayPayment = new EwayPayment($('onestep_form'), '<?php echo $_config->getEncryptionKey() ?>');
+                    ewayPayment.paymentUrl = "<?php echo Mage::getUrl('ewayrapid/transparent/build', array('_secure'=>true)); ?>";
+                    <?php if($_mageworld && Mage::helper('onestepcheckout')->onlyProductDownloadable()):?>
+                        var notshipmethod=1;
+                    <?php else:?>
+                        var notshipmethod=$MW_Onestepcheckout("input[name=shipping_method]:checked").val();
+                    <?php endif?>
+                    if ($('p_method_ewayrapid_transparent_visa') && $('p_method_ewayrapid_transparent_visa').checked) {
+                        if (!$('visa_checkout_call_id').value) {
+                            document.getElementById('visa_checkout_button').click();
+                            return;
+                        }
+                    }
+                    ewayPayment.MageWorld.submit(e, notshipmethod, true);
+                });
+            }
+            }
+        });
+
+        <?php endswitch; ?>
+
+    </script>
+<?php endif; ?>
+
+<?php if($_backend && $_backendIFrame): ?>
+    <script type="text/javascript">
+        if(typeof AdminOrder === 'function'){
+            AdminOrder.prototype.submit = ewayPayment.submitAdminOrderIFrame;
+        }
+        ewayPayment.paymentUrl = "<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/sales_order_create/ewayiframe', array('_secure'=>true)); ?>";
+        function eWayRapidCallback (result, transactionID, errors) {
+            if (result == "Complete") {
+                setLocation(ewayReturnUrl);
+            } else if (result == "Error") {
+                alert("There was a problem completing the payment: " + errors);
+                $('loading-mask') && $('loading-mask').hide();
+            } else{
+                $('loading-mask') && $('loading-mask').hide();
+            }
+        }
+    </script>
+<?php endif; ?>
+
+<?php if ($_config->isRapidIframeConnection() && !$_backend): ?>
+    <?php if($_checkoutExtension) {
+        Mage::getSingleton('core/session')->setCheckoutExtension($_checkoutExtension);
+    } else {
+        Mage::getSingleton('core/session')->unsCheckoutExtension();
+    }?>
+    <script type="text/javascript">
+        var creditcard = '<?php echo Eway_Rapid31_Model_Config::CREDITCARD_METHOD ?>';
+        var ewayReturnUrl = '';
+
+        <?php switch($_checkoutExtension):
+                case 'OneStepCheckout': // OneStepCheckout extension ?>
+
+        // Idev OSC
+        <?php if(Mage::getStoreConfig('onestepcheckout/general/rewrite_checkout_links')): ?>
+
+            function eWayRapidCallback (result, transactionID, errors) {
+                if (result == "Complete") {
+                    setLocation(ewayReturnUrl);
+                } else if (result == "Error") {
+                    alert("There was a problem completing the payment: " + errors);
+
+                    already_placing_order = false;
+                    var submitelement = $('onestepcheckout-place-order');
+
+                    $$('.onestepcheckout-place-order-loading').first() && $$('.onestepcheckout-place-order-loading').first().remove();
+                    submitelement.addClassName('orange').removeClassName('grey');
+                    submitelement.disabled = false;
+                } else{
+                    already_placing_order = false;
+                    var submitelement = $('onestepcheckout-place-order');
+
+                    $$('.onestepcheckout-place-order-loading').first() && $$('.onestepcheckout-place-order-loading').first().remove();
+                    submitelement.addClassName('orange').removeClassName('grey');
+                    submitelement.disabled = false;
+                }
+            }
+
+            document.observe("dom:loaded", function () {
+
+                ewayPayment = new EwayPayment(null, null);
+
+                if (typeof (ewayPayment.ewaysavedOldOrder) == "undefined") {
+                    EwayPayment.prototype.ewaysavedOldOrder = $('onestepcheckout-form').submit;
+                }
+
+                ewayPayment.paymentUrl = "<?php echo Mage::getUrl('onestepcheckout/index/index', array('_secure'=>true)); ?>";
+
+                $('onestepcheckout-form') && ($('onestepcheckout-form').submit = function(){
+                    if (EwayPayment.isEwayRapidMethod(payment.currentMethod) && ewayPayment.paymentUrl != null ) {
+
+                        var formData = $('onestepcheckout-form').serialize(true);
+
+                        ewayPayment.OneStepCheckout.saveOrderWithIframe(formData);
+                    }else{
+                        ewayPayment.ewaysavedOldOrder.apply($('onestepcheckout-form'));
+                    }
+                });
+            });
+        <?php endif; ?>
+
+            // Magestore OSC
+        <?php if(Mage::getStoreConfig('onestepcheckout/general/active')): ?>
+
+            function eWayRapidCallback (result, transactionID, errors) {
+                if (result == "Complete") {
+                    setLocation(ewayReturnUrl);
+                } else if (result == "Error") {
+                    alert("There was a problem completing the payment: " + errors);
+                    $('onestepcheckout-place-order-loading').hide();
+                    $('onestepcheckout-button-place-order').addClassName('onestepcheckout-btn-checkout');
+                    $('onestepcheckout-button-place-order').removeClassName('place-order-loader');
+                } else{
+                    $('onestepcheckout-place-order-loading').hide();
+                    $('onestepcheckout-button-place-order').addClassName('onestepcheckout-btn-checkout');
+                    $('onestepcheckout-button-place-order').removeClassName('place-order-loader');
+                }
+            }
+
+            document.observe("dom:loaded", function () {
+                ewayPayment = new EwayPayment(null, null);
+
+                if (ewayPayment && $('one-step-checkout-form'))
+                    Payment.prototype.switchMethod = ewayPayment.OneStepCheckout.switchMethod;
+
+                if (typeof (ewayPayment.ewaysavedOldOrder) == "undefined") {
+                    EwayPayment.prototype.ewaysavedOldOrder = $('one-step-checkout-form').submit;
+                }
+
+                ewayPayment.paymentUrl = "<?php echo Mage::getUrl('onestepcheckout/index/saveOrder', array('_secure'=>true)); ?>";
+
+                $('one-step-checkout-form') && ($('one-step-checkout-form').submit = function(){
+
+                    var currentMethod = $RF($('one-step-checkout-form'), 'payment[method]');
+
+                    if (EwayPayment.isEwayRapidMethod(currentMethod) && ewayPayment.paymentUrl != null ) {
+
+                        var formData = $('one-step-checkout-form').serialize(true);
+
+                        ewayPayment.OneStepCheckout.saveOrderWithIframe(formData);
+                    }else{
+                        ewayPayment.ewaysavedOldOrder.apply($('one-step-checkout-form'));
+                    }
+                });
+            });
+        <?php endif; ?>
+        <?php break; ?>
+
+        <?php case 'LightCheckout': ?>
+
+        function eWayRapidCallback (result, transactionID, errors) {
+            if (result == "Complete") {
+                setLocation(ewayReturnUrl);
+            } else if (result == "Error") {
+                alert("There was a problem completing the payment: " + errors);
+                checkout.hideLoadinfo()
+            } else{
+                checkout.hideLoadinfo()
+            }
+        }
+
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment(null, null);
+            if (typeof checkout.LightcheckoutSubmitOld == "undefined") {
+                checkout.saveOrderOld = checkout.saveorder;
+                checkout.saveorder = ewayPayment.Lightcheckout.saveorder;
+            }
+        });
+        <?php break; ?>
+
+
+        <?php case 'FireCheckout': // FireCheckout extension ?>
+
+        function eWayRapidCallback (result, transactionID, errors) {
+            if (result == "Complete") {
+                setLocation(ewayReturnUrl);
+            } else if (result == "Error") {
+                alert("There was a problem completing the payment: " + errors);
+                checkout.setLoadWaiting(false);
+                $('review-please-wait').hide();
+            } else{
+                checkout.setLoadWaiting(false);
+                $('review-please-wait').hide();
+            }
+        }
+
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment(null, null);
+            if (typeof FireCheckout.prototype.ewaySetResponse == "undefined") {
+                FireCheckout.prototype.ewaySetResponse = FireCheckout.prototype.setResponse;
+                FireCheckout.prototype.setResponse = ewayPayment.FireCheckout.setResponse;
+            }
+        });
+        <?php break; ?>
+        <?php case 'IWDOnePageCheckout': // FireCheckout extension ?>
+
+        function eWayRapidCallback (result, transactionID, errors) {
+            if (result == "Complete") {
+                setLocation(ewayReturnUrl);
+            } else if (result == "Error") {
+                alert("There was a problem completing the payment: " + errors);
+                IWD.OPC.Checkout.hideLoader();
+                IWD.OPC.Checkout.unlockPlaceOrder();
+            } else{
+                IWD.OPC.Checkout.hideLoader();
+                IWD.OPC.Checkout.unlockPlaceOrder();
+            }
+        }
+
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment(null, null);
+            if (typeof IWD.OPC.ewayOldPreparePaymentResponse == "undefined") {
+                IWD.OPC.ewayOldPreparePaymentResponse = IWD.OPC.preparePaymentResponse;
+                IWD.OPC.preparePaymentResponse = ewayPayment.IWDOnePageCheckout.preparePaymentResponse;
+            }
+        });
+        <?php break; ?>
+        <?php case 'MultiShippingAddress': // Magento default multi shipping address ?>
+        var ewayPayment = new EwayPayment($('multishipping-billing-form'), '<?php echo $_config->getEncryptionKey() ?>');
+        <?php break; ?>
+
+        <?php default: // Magento default one page checkout ?>
+
+        function eWayRapidCallback (result, transactionID, errors) {
+            if (result == "Complete") {
+                setLocation(ewayReturnUrl);
+            } else if (result == "Error") {
+                alert("There was a problem completing the payment: " + errors);
+                $('review-please-wait') && $('review-please-wait').hide();
+                $('review-buttons-container') && $('review-buttons-container').down('button').show();
+            } else{
+                $('review-please-wait') && $('review-please-wait').hide();
+                $('review-buttons-container') && $('review-buttons-container').down('button').show();
+            }
+        }
+
+        var ewayPayment = new EwayPayment(null, null);
+
+        if (typeof (ewayPayment.ewaysavedOldOrder) == "undefined") {
+            ewayPayment.ewaysavedOldOrder = Review.prototype.save;
+        }
+        ewayPayment.paymentUrl = "<?php echo Mage::getUrl('ewayrapid/sharedpage/iframe', array('_secure'=>true)); ?>";
+        Review.prototype.save = ewayPayment.saveOrderWithIframe;
+
+        <?php endswitch; ?>
+
+    </script>
+<?php endif; ?>
+
+<?php if($_config->isSecureFieldConnection() && !$_backend): ?>
+    <?php if($_checkoutExtension) {
+        Mage::getSingleton('core/session')->setCheckoutExtension($_checkoutExtension);
+    } else {
+        Mage::getSingleton('core/session')->unsCheckoutExtension();
+    }?>
+
+    <script type="text/javascript">
+        var cvnRequire = true;
+        var secureForm = new EwaySecureForm(cvnRequire);
+        document.observe("dom:loaded", function () {
+            secureForm.setupSecureField();
+            // Default Magento
+            if(typeof Payment !== 'undefined'){
+                EwaySecureForm.prototype.oldPaymentSave = Payment.prototype.save;
+                EwaySecureForm.prototype.payment = payment;
+                Payment.prototype.save = secureForm.secureFieldPaymentSave;
+            }
+        });
+
+        // OneStepCheckout extensions
+        <?php switch($_checkoutExtension):
+        case 'IWDOnePageCheckout' :?>
+        //IWD Onestepcheckout
+        document.observe("dom:loaded", function () {
+            IWD.OPC.Checkout.pullPayments = secureForm.IWDOnePageCheckout.pullPayments;
+            IWD.OPC.ewayOldSavePayment = IWD.OPC.savePayment;
+            IWD.OPC.savePayment = secureForm.IWDOnePageCheckout.savePayment;
+            IWD.OPC.validatePayment = secureForm.IWDOnePageCheckout.validatePayment;
+        });
+        <?php break; ?>
+        <?php case 'FireCheckout': // FireCheckout extension ?>
+        document.observe("dom:loaded", function () {
+            var ewayPayment = new EwayPayment($('firecheckout-form'), '<?php echo $_config->getEncryptionKey() ?>');
+            if (typeof FireCheckout.prototype.ewayOldSave == "undefined") {
+                FireCheckout.prototype.oldSave = FireCheckout.prototype.save;
+                FireCheckout.prototype.save = secureForm.FireCheckout.save;
+            }
+        });
+        <?php break; ?>
+        <?php case 'OneStepCheckout':  ?>
+        document.observe("dom:loaded", function () {
+            <?php if(Mage::getStoreConfig('onestepcheckout/general/rewrite_checkout_links')): ?>
+            // Idev_Onestepcheckout
+            if($('onestepcheckout-form')){
+            $('onestepcheckout-form').oldSubmit = $('onestepcheckout-form').submit;
+
+            $('onestepcheckout-form').submit = secureForm.OneStepCheckout.submit;
+            }
+            <?php endif; ?>
+
+            // Magestore OSC
+            <?php if(Mage::getStoreConfig('onestepcheckout/general/active')): ?>
+            if ($('onestepcheckout-button-place-order') && $('one-step-checkout-form')) {
+                // Need to remove both inline onclick.
+                var button = document.getElementById('onestepcheckout-button-place-order').removeAttribute('onclick');
+                $('onestepcheckout-button-place-order').stopObserving('click');
+                $('onestepcheckout-button-place-order').observe('click', function (event) {
+                    Event.stop(event);
+                    secureForm.MagestoreOsc.placeOrder($('one-step-checkout-form'));
+                });
+            }
+            <?php endif; ?>
+        });
+        <?php break; ?>
+
+        <?php case 'MultiShippingAddress': // Magento default multi shipping address ?>
+        document.observe("dom:loaded", function () {
+            EwaySecureForm.prototype.MultiShipping.oldSubmit = $('multishipping-billing-form').onsubmit;
+            $('multishipping-billing-form').onsubmit = secureForm.MultiShipping.submit;
+        });
+        <?php break; ?>
+        <?php case 'LightCheckout': ?>
+        document.observe("dom:loaded", function () {
+            if (typeof checkout !== 'undefined' && typeof checkout.LightcheckoutSubmitOld === "undefined") {
+                checkout.LightcheckoutSubmitOld = checkout.LightcheckoutSubmit;
+                checkout.LightcheckoutSubmit = secureForm.Lightcheckout.LightcheckoutSubmit;
+            }
+        });
+        <?php break; ?>
+        <?php endswitch; ?>
+    </script>
+
+<?php endif; ?>
+
+<?php if($_config->isSecureFieldConnection() && $_backend): ?>
+    <script type="text/javascript">
+        document.observe("dom:loaded", function () {
+            EwaySecureForm.prototype.oldPaymentSave = AdminOrder.prototype.submit;
+        });
+    </script>
+<?php endif; ?>
+

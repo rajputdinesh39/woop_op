@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <adminhtml_sales_order_create_index>
+        <reference name="head">
+            <action method="addExternalItem"><type>external_js</type><name>https://secure.ewaypayments.com/scripts/eCrypt.js</name><params/></action>
+            <action method="addExternalItem"><type>external_js</type><name>https://secure.ewaypayments.com/scripts/eWAY.min.js</name><params/></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>ewayrapid.css</script></action>
+        </reference>
+        <reference name="js">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action method="setArea"><area>frontend</area></action>
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate" >
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+            </block>
+        </reference>
+    </adminhtml_sales_order_create_index>
+    <adminhtml_ewayadmin_ewayorders>
+        <reference name="menu">
+            <action method="setActive">
+                <menupath>sales/eway_orders</menupath>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="ewayrapid/adminhtml_sales_order" name="eway_orders" />
+        </reference>
+    </adminhtml_ewayadmin_ewayorders>
+    <adminhtml_ewayadmin_grid>
+        <update handle="formkey"/>
+        <block type="ewayrapid/adminhtml_sales_order_grid" name="eway_order.grid" output="toHtml"></block>
+    </adminhtml_ewayadmin_grid>
+
+
+    <adminhtml_customer_edit>
+        <reference name="head">
+            <action method="addExternalItem"><type>external_js</type><name>https://secure.ewaypayments.com/scripts/eCrypt.js</name><params/></action>
+            <action method="addExternalItem"><type>external_js</type><name>https://secure.ewaypayments.com/scripts/eWAY.min.js</name><params/></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>ewayrapid.css</script></action>
+        </reference>
+        <reference name="js">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action method="setArea"><area>frontend</area></action>
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate" >
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+            </block>
+        </reference>
+        <reference name="customer_edit_tabs">
+            <block type="ewayrapid/adminhtml_customer_savedcard" name="admin.customer.savedcard" template="ewayrapid/customer/cardcontainer.phtml">
+                <block type="ewayrapid/adminhtml_customer_method" name="admin.customer.ewayrapid.method" template="ewayrapid/customer/method.phtml" before="-">
+                    <action method="setCode"><code>ewayrapid</code></action>
+                    <block type="ewayrapid/adminhtml_customer_edit_tab_cards" name="admin.customer.ewayrapid.cards" template="ewayrapid/customer/edit/tab/cards.phtml">
+                        <action method="setCode"><code>ewayrapid</code></action>
+                    </block>
+                    <block type="ewayrapid/adminhtml_customer_edit_tab_form" name="admin.customer.ewayrapid.form" template="ewayrapid/customer/edit/tab/form.phtml">
+                        <action method="setCode"><code>ewayrapid</code></action>
+                    </block>
+                </block>
+            </block>
+            <action method="addTab"><name>admin.customer.savedcard</name><block>admin.customer.savedcard</block></action>
+        </reference>
+    </adminhtml_customer_edit>
+
+    <adminhtml_ewayrapid_savedcard_load>
+        <block type="ewayrapid/adminhtml_customer_edit_tab_form" name="root" template="ewayrapid/customer/edit/tab/form.phtml">
+            <action method="setCode"><code>ewayrapid</code></action>
+        </block>
+    </adminhtml_ewayrapid_savedcard_load>
+
+    <adminhtml_ewayrapid_savedcard_save>
+        <block type="ewayrapid/adminhtml_customer_edit_tab_cards" name="root" template="ewayrapid/customer/edit/tab/cards.phtml">
+            <action method="setCode"><code>ewayrapid</code></action>
+        </block>
+    </adminhtml_ewayrapid_savedcard_save>
+
+    <adminhtml_ewayrapid_savedcard_savetoken>
+        <block type="ewayrapid/adminhtml_customer_edit_tab_cards" name="root" template="ewayrapid/customer/edit/tab/cards.phtml">
+            <action method="setCode"><code>ewayrapid</code></action>
+        </block>
+    </adminhtml_ewayrapid_savedcard_savetoken>
+</layout>

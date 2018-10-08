@@ -1,0 +1,36 @@
+<div class="entry-edit-head">
+    <h4 class="icon-head head-customer-address-list"><?php echo $this->__('Saved Card') ?></h4>
+</div>
+<div class="fieldset" style="padding:0">
+    <ol>
+        <?php if ($this->checkCards()): ?>
+            <?php foreach ($this->getCards() as $id => $card): ?>
+                <?php if(!$card->getActive()) continue; ?>
+                <li class="item info-box" id="token-<?php echo $id ?>" style="cursor:default">
+                    <h3 class="box-title">
+                        <?php if ($card->getExpYear()): ?>
+                            <small class="right"><?php echo $card->getExpMonth() . '/' . $card->getExpYear() ?></small>
+                        <?php endif; ?>
+                        <?php echo $this->__('Card: %s', $card->getCard()) ?>
+                    </h3>
+                    <address class="box-content" style="overflow:auto">
+
+                        <?php echo $this->formatAddress($card->getAddress()) ?>
+                        <div class="right">
+                            <?php if(Mage::helper('ewayrapid')->checkCardName($card) != Eway_Rapid31_Model_Config::PAYPAL_STANDARD_METHOD): ?>
+                                <button class="button" type="button" onclick="ewayrapid.editCard( <?php echo $id; ?> );">
+                                    <span><?php echo $this->__('Edit'); ?></span>
+                                </button>
+                            <?php endif; ?>
+                            <button class="button" type="button" onclick="ewayrapid.deleteCard( <?php echo $id; ?> );">
+                                <span><?php echo $this->__('Delete'); ?></span>
+                            </button>
+                        </div>
+                    </address>
+                </li>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <li class="item"><?php echo $this->__('No payment data saved yet.') ?></li>
+        <?php endif; ?>
+    </ol>
+</div>

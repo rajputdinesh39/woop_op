@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <checkout_onepage_index>
+        <reference name="head">
+            <block type="core/text" name="external_js">
+                <action method="setText"><text><![CDATA[
+                <script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eCrypt.js"></script>
+                <script src="https://secure.ewaypayments.com/scripts/eWAY.min.js" data-init="false"></script>
+                                                ]]> </text> </action>
+            </block>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <reference name="content">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate">
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+            </block>
+        </reference>
+    </checkout_onepage_index>
+
+    <checkout_multishipping_billing>
+        <reference name="head">
+            <block type="core/text" name="external_js">
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eCrypt.js"></script>]]> </text> </action>
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eWAY.min.js" data-init="false"></script>]]> </text> </action>
+            </block>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <reference name="content">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate">
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+                <action method="setCheckoutExtension">
+                    <name>MultiShippingAddress</name>
+                </action>
+            </block>
+        </reference>
+    </checkout_multishipping_billing>
+
+    <customer_account>
+        <reference name="customer_account_navigation">
+            <action ifconfig="payment/ewayrapid_ewayone/active" method="addLink" translate="label" module="ewayrapid">
+                <name>my-creditcards</name>
+                <path>ewayrapid/mycards/</path>
+                <label>My Credit Cards</label>
+            </action>
+
+            <action ifconfig="payment/ewayrapid_transparentRedirect/active" method="addLink" translate="label" module="ewayrapid">
+                <name>my-transparent-redirect-card</name>
+                <path>ewayrapid/transparentredirectcard/</path>
+                <label>My Transparent Redirect Card</label>
+            </action>
+
+        </reference>
+    </customer_account>
+    <ewayrapid_mycards_index>
+        <update handle="customer_account"/>
+        <reference name="my.account.wrapper">
+            <block type="ewayrapid/customer_mycards" template="ewayrapid/customer/mycards.phtml" name="ewayrapid.token.list"></block>
+            <block type="customer/account_dashboard" name="customer.account.link.back" template="customer/account/link/back.phtml"/>
+        </reference>
+    </ewayrapid_mycards_index>
+
+    <ewayrapid_mycards_edit>
+        <reference name="head">
+            <block type="core/text" name="external_js">
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eCrypt.js"></script>]]> </text> </action>
+            </block>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <update handle="customer_account"/>
+        <reference name="my.account.wrapper">
+            <block type="ewayrapid/customer_edit" template="ewayrapid/customer/edit.phtml" name="ewayrapid.token.edit"></block>
+        </reference>
+    </ewayrapid_mycards_edit>
+
+    <onestepcheckout_index_index>
+        <reference name="head">
+            <block type="core/text" name="external_js">
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eCrypt.js"></script>]]> </text> </action>
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eWAY.min.js" data-init="false"></script>]]> </text> </action>
+            </block>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate">
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+                <action method="setCheckoutExtension">
+                    <name>OneStepCheckout</name>
+                </action>
+            </block>
+        </reference>
+    </onestepcheckout_index_index>
+
+    <firecheckout_index_index>
+        <reference name="head">
+            <block type="core/text" name="external_js">
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eCrypt.js"></script>]]> </text> </action>
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eWAY.min.js" data-init="false"></script>]]> </text> </action>
+            </block>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate">
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+                <action method="setCheckoutExtension">
+                    <name>FireCheckout</name>
+                </action>
+            </block>
+        </reference>
+    </firecheckout_index_index>
+
+    <opc_index_index>
+        <reference name="head">
+            <block type="core/text" name="external_js">
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eWAY.min.js" data-init="false"></script>]]> </text> </action>
+            </block>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate">
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+                <action method="setCheckoutExtension">
+                    <name>IWDOnePageCheckout</name>
+                </action>
+            </block>
+        </reference>
+    </opc_index_index>
+
+    <gomage_checkout_onepage_index>
+        <reference name="head">
+            <block type="core/text" name="external_js">
+                <action method="setText"><text><![CDATA[<script type="text/javascript" src="https://secure.ewaypayments.com/scripts/eWAY.min.js" data-init="false"></script>]]> </text> </action>
+            </block>
+            <action ifconfig="payment/ewayrapid_general/active" method="addJs"><script>ewayrapid/ewayrapid.js</script></action>
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="core/template" name="ewayrapid.js" after="-">
+                <action ifconfig="payment/ewayrapid_general/active" method="setTemplate">
+                    <template>ewayrapid/js.phtml</template>
+                </action>
+                <action method="setCheckoutExtension">
+                    <name>LightCheckout</name>
+                </action>
+            </block>
+        </reference>
+    </gomage_checkout_onepage_index>
+
+    <hanlder_transparent_layout_empty>
+        <update handle="default"/>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/empty.phtml</template>
+            </action>
+        </reference>
+    </hanlder_transparent_layout_empty>
+
+    <hanlder_transparent_layout>
+        <update handle="default"/>
+        <reference name="head">
+            <action ifconfig="payment/ewayrapid_general/active" method="addCss"><script>css/ewayrapid.css</script></action>
+        </reference>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/1column.phtml</template>
+            </action>
+        </reference>
+    </hanlder_transparent_layout>
+
+    <ewayrapid_transparent_paynow>
+        <update handle="hanlder_transparent_layout_empty"/>
+        <reference name="content">
+            <block type="ewayrapid/redirect_transparent" name="transparent.block.paynow"/>
+        </reference>
+    </ewayrapid_transparent_paynow>
+
+    <ewayrapid_transparent_redirect>
+        <update handle="hanlder_transparent_layout_empty"/>
+        <reference name="content">
+            <block type="ewayrapid/redirect_transparentCheckout" name="transparent.block.checkout"/>
+        </reference>
+    </ewayrapid_transparent_redirect>
+
+    <ewayrapid_handle_review>
+        <label>Eway Paypal Order Review Form</label>
+        <remove name="right"/>
+        <remove name="left"/>
+
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/1column.phtml</template>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="ewayrapid/redirect_paypalReview" name="eway.block.review">
+            </block>
+        </reference>
+    </ewayrapid_handle_review>
+
+    <ewayrapid_transparent_review>
+        <update handle="ewayrapid_handle_review"/>
+    </ewayrapid_transparent_review>
+
+    <ewayrapid_sharedpage_review>
+        <update handle="ewayrapid_handle_review"/>
+    </ewayrapid_sharedpage_review>
+</layout>

@@ -1,0 +1,261 @@
+<div class="entry-edit-head">
+	<h4 class="icon-head head-customer-address-list">
+		<?php if( $this->isEdit() ): ?>
+			<?php echo $this->__('Editing Card %s', $this->getCard()->getCard()); ?>
+		<?php else: ?>
+			<?php echo $this->__('Add A Credit Card') ?>
+		<?php endif; ?>
+	</h4>
+</div>
+<div class="fieldset">
+	<input type="hidden" id="token_id" name="<?php echo $this->getCode(); ?>[token_id]" value="<?php echo $this->getTokenId() ? $this->getTokenId() : 0; ?>" />
+	<input type="hidden" name="<?php echo $this->getCode(); ?>[TokenCustomerID]" value="<?php echo $this->getCard()->getToken() ? $this->getCard()->getToken() : ''; ?>" />
+	<h4><?php echo $this->__('Cardholder Information') ?></h4>
+	<table class="form-list" cellspacing="0">
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_title"><?php echo $this->__('Title') ?></label></td>
+			<td class="value">
+				<select id="<?php echo $this->getCode(); ?>_title" name="<?php echo $this->getCode(); ?>[address][title]">
+					<?php foreach ($this->getPrefixOptions() as $_option): ?>
+						<option
+							value="<?php echo $_option ?>"<?php if ($this->getCard()->getAddress()->getTitle() == $_option): ?>
+							selected="selected"<?php endif; ?>><?php echo $this->__($_option) ?></option>
+					<?php endforeach; ?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_fn"><?php echo $this->__('First Name') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_fn" name="<?php echo $this->getCode(); ?>[address][firstname]"
+					   class="input-text save-card-validate" data-validate="required-entry validate-length maximum-length-50" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getData('FirstName')); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_ln"><?php echo $this->__('Last Name') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_ln" name="<?php echo $this->getCode(); ?>[address][lastname]"
+					   class="input-text save-card-validate" data-validate="required-entry validate-length maximum-length-50" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getData('LastName')); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_company"><?php echo $this->__('Company') ?></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_company" name="<?php echo $this->getCode(); ?>[address][company]" class="input-text" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getCompanyName()); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_job_desc"><?php echo $this->__('Job Description') ?></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_job_desc" name="<?php echo $this->getCode(); ?>[address][job_description]" class="input-text" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getJobDescription()); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_street1"><?php echo $this->__('Street Address') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_street1" name="<?php echo $this->getCode(); ?>[address][street][]"
+					   class="input-text save-card-validate" data-validate="required-entry validate-length maximum-length-50" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getStreet1()); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_street2" name="<?php echo $this->getCode(); ?>[address][street][]"
+					   class="input-text save-card-validate" data-validate="validate-length maximum-length-50" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getStreet2()); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_city"><?php echo $this->__('City') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_city" name="<?php echo $this->getCode(); ?>[address][city]"
+					   class="input-text save-card-validate" data-validate="required-entry validate-length maximum-length-50" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getData('City')); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_region_id"><?php echo $this->__('State/Province') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<select class="validate-select" title="State/Province" name="<?php echo $this->getCode(); ?>[address][region_id]" id="<?php echo $this->getCode(); ?>_region_id">
+					<option value=""><?php echo $this->__('Please select region, state or province') ?></option>
+				</select>
+				<script type="text/javascript">
+					$('<?php echo $this->getCode(); ?>_region_id').setAttribute('defaultValue', '<?php echo $this->getRegionId()?>');
+				</script>
+				<input type="text" class="input-text" title="State/Province" value="<?php echo $this->escapeHtml( $this->getCard()->getAddress()->getData('State') ); ?>" name="<?php echo $this->getCode(); ?>[address][region]" id="<?php echo $this->getCode(); ?>_region" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_postcode"><?php echo $this->__('Zip/Postal Code') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_postcode" name="<?php echo $this->getCode(); ?>[address][postcode]"
+					   class="input-text save-card-validate" data-validate="required-entry validate-zip-international validate-length maximum-length-30" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getData('PostalCode')); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_country"><?php echo $this->__('Country') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<?php echo Mage::helper('ewayrapid')->getCountryHtmlSelect( $this->getCode() . '[address][country_id]',strtoupper($this->getCard()->getAddress()->getCountry()), $this->getCode().'_country' ); ?>
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_telephone"><?php echo $this->__('Telephone') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_telephone" name="<?php echo $this->getCode(); ?>[address][telephone]"
+					   class="input-text save-card-validate" data-validate="required-entry eway-validate-phone validate-length maximum-length-32" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getData('Phone')); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_mobile"><?php echo $this->__('Mobile') ?></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_mobile" name="<?php echo $this->getCode(); ?>[address][mobile]"
+					   class="input-text save-card-validate" data-validate="eway-validate-phone validate-length maximum-length-32" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getMobile()); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_email"><?php echo $this->__('Email') ?></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_email" name="<?php echo $this->getCode(); ?>[address][email]"
+					   class="input-text save-card-validate" data-validate="validate-email validate-length maximum-length-50" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getEmail()); ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_fax"><?php echo $this->__('Fax') ?></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_fax" name="<?php echo $this->getCode(); ?>[address][fax]"
+					   class="input-text save-card-validate" data-validate="eway-validate-phone validate-length maximum-length-32" value="<?php echo $this->escapeHtml($this->getCard()->getAddress()->getData('Fax')); ?>" />
+			</td>
+		</tr>
+	</table>
+    <?php if($this->isSecureField()): ?>
+        <table class="form-list">
+            <tr class="cc_owner">
+                <td class="label"><label><?php echo $this->__('Name on Card') ?> <span class="required">*</span></label>
+                </td>
+                <td class="value">
+                    <div id="eway-secure-field-name" class="secure-form-input secure-form-name"></div>
+                    <div id="eway-secure-field-name-error" class="secure-form-error"
+                         style="display: none"><?php echo $this->__('Invalid Name on Card') ?></div>
+                </td>
+            </tr>
+            <tr class="cc_number">
+                <td class="label"><label><?php echo $this->__('Credit Card Number') ?> <span class="required">*</span></label>
+                </td>
+                <td class="value">
+                    <?php if ($this->isEdit()) :?>
+                        <div class="secure-form-input"><input id="eway-secure-field-card-edit-input" type="text" disabled="disabled"
+                                                              value="<?php echo $this->getCard()->getCard() ?>"></div>
+                        <div id="eway-secure-field-card" style="display: none;" class="secure-form-input secure-form-card"></div>
+                    <?php else: ?>
+                        <div id="eway-secure-field-card" class="secure-form-input secure-form-card"></div>
+                    <?php endif; ?>
+                    <div id="eway-secure-field-card-error" class="secure-form-error"
+                         style="display: none"><?php echo $this->__('Invalid Card Number') ?></div>
+                </td>
+            </tr>
+            <tr class="cc_expiry">
+                <td class="label"><label><?php echo $this->__('Expiration Date') ?> <span class="required">*</span></label>
+                </td>
+                <td class="value">
+                    <div id="eway-secure-field-expiry" class="secure-form-input secure-form-expiry"></div>
+                    <div id="eway-secure-field-expiry-error" class="secure-form-error"
+                         style="display: none"><?php echo $this->__('Invalid Expiration Date') ?></div>
+                </td>
+        </table>
+        <input type="hidden" id="securefieldcode" name="<?php echo $this->getCode(); ?>[payment][secured_card_data]" value=""/>
+        <input type="hidden" id="eway-public-api-key" value="<?php echo $this->getPublicApiKey() ?>">
+        <input type="hidden" id="eway-secure-form-mask-value" value="<?php echo $this->isMaskValues() ?>">
+        <input type="hidden" id="eway-secure-form-auto-complete" value="<?php echo $this->isAutoComplete() ?>">
+    <?php elseif(!Mage::helper('ewayrapid')->useIframeInBackend()): ?>
+	<h4><?php echo $this->__('Credit Card Information') ?></h4>
+	<table class="form-list" cellspacing="0" id="<?php echo $this->getCode(); ?>_ccInfo">
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_cc_owner"><?php echo $this->__('Name on Card') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_cc_owner" name="<?php echo $this->getCode(); ?>[payment][cc_owner]" title="<?php echo $this->__('Card Holder Name') ?>"
+					   class="input-text save-card-validate" data-validate="required-entry validate-length maximum-length-50" value="<?php echo $this->escapeHtml($this->getCard()->getOwner()); ?>" autocomplete="off" />
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_cc_number"><?php echo $this->__('Credit Card Number') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<input type="text" id="<?php echo $this->getCode(); ?>_saved_cc_number" name="<?php echo $this->getCode(); ?>[payment][cc_number]"
+					   title="<?php echo $this->__('Credit Card Number') ?>" class="input-text save-card-validate"
+					   data-validate="validate-cc-number validate-cc-type-auto validate-cc-type"
+					   <?php if($this->isEdit()): ?>value="<?php echo $this->escapeHtml($this->getCard()->getCard()); ?>" disabled="disabled" <?php endif;?> autocomplete="off" />
+				<input type="hidden" id="<?php echo $this->getCode(); ?>_saved_cc_type" name="<?php echo $this->getCode(); ?>[payment][cc_type]"
+					   value="<?php echo $this->getCard()->getType() ?>"/>
+			</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="<?php echo $this->getCode(); ?>_expiration"><?php echo $this->__('Expiration Date') ?> <span class="required">*</span></label></td>
+			<td class="value">
+				<select id="<?php echo $this->getCode(); ?>_expiration" name="<?php echo $this->getCode(); ?>[payment][cc_exp_month]" class="month save-card-validate"
+						data-validate="validate-cc-exp required-entry" style="width:150px">
+					<option value=""><?php echo $this->__('Month') ?></option>
+					<?php $_ccExpMonth = $this->getCard()->getExpMonth() ?>
+					<?php foreach(Mage::getSingleton('payment/config')->getMonths() as $k=>$v ): ?>
+						<option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+					<?php endforeach ?>
+				</select>
+
+				<select id="<?php echo $this->getCode(); ?>_expiration_yr" name="<?php echo $this->getCode(); ?>[payment][cc_exp_year]" class="year" style="width:80px">
+					<option value=""><?php echo $this->__('Year') ?></option>
+					<?php $_ccExpYear = $this->getCard()->getExpYear() ?>
+					<?php foreach(Mage::getSingleton('payment/config')->getYears() as $k=>$v ): ?>
+						<option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+					<?php endforeach ?>
+				</select>
+			</td>
+		</tr>
+<!--		--><?php //if( Mage::helper('payment')->getMethodInstance( $this->getCode() )->getConfigData('useccv') ): ?>
+<!--			<tr>-->
+<!--				<td class="label"><label for="--><?php //echo $this->getCode(); ?><!--_cc_cid">--><?php //echo $this->__('Card Verification Number') ?><!-- <span class="required">*</span></label></td>-->
+<!--				<td class="value">-->
+<!--					<input type="text" title="--><?php //echo $this->__('Card Verification Number') ?><!--" class="input-text cvv" id="--><?php //echo $this->getCode(); ?><!--_cc_cid" name="--><?php //echo $this->getCode(); ?><!--[payment][cc_cid]" value="" style="width:50px" autocomplete="off" />-->
+<!--				</td>-->
+<!--			</tr>-->
+<!--		--><?php //endif; ?>
+	</table>
+<!--	--><?php //$requireCvv = Mage::helper('payment')->getMethodInstance( $this->getCode() )->getAdvancedConfigData('require_ccv'); ?>
+<!--	--><?php //if( $this->isEdit() && Mage::helper('payment')->getMethodInstance( $this->getCode() )->getConfigData('useccv') && $requireCvv ): ?>
+<!--		<table class="form-list" cellspacing="0" id="--><?php //echo $this->getCode(); ?><!--_ccInfoCcv">-->
+<!--			<tr>-->
+<!--				<td class="label"><label for="--><?php //echo $this->getCode(); ?><!--_saved_cc_cid">--><?php //echo $this->__('Card Verification Number') ?><!-- <span class="required">*</span></label></td>-->
+<!--				<td class="value">-->
+<!--					<input type="text" title="--><?php //echo $this->__('Card Verification Number') ?><!--" class="input-text cvv" id="--><?php //echo $this->getCode(); ?><!--_saved_cc_cid" name="--><?php //echo $this->getCode(); ?><!--[payment][saved_cc_cid]" value="" style="width:50px" autocomplete="off" />-->
+<!--				</td>-->
+<!--			</tr>-->
+<!--		</table>-->
+<!--	--><?php //endif; ?>
+	<?php endif; ?>
+	<table class="form-list" cellspacing="0">
+		<tr>
+			<td class="label"></td>
+			<td class="value">
+				<button class="button" type="button" onclick="<?php echo $this->getCode(); ?>.saveCard(<?php echo $this->getCard()->getToken() ? $this->getCard()->getToken() : ''?>);"><span><?php echo $this->__('Save') ?></span></button>
+				<a href="#" onclick="<?php echo $this->getCode(); ?>.editCard(0); return false;"><?php echo $this->__('Cancel'); ?></a>
+			</td>
+		</tr>
+	</table>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+	new RegionUpdater('<?php echo $this->getCode(); ?>_country', '<?php echo $this->getCode(); ?>_region', '<?php echo $this->getCode(); ?>_region_id', <?php echo Mage::helper('directory')->getRegionJson() ?>, undefined, '<?php echo $this->getCode(); ?>_postcode');
+
+	function <?php echo $this->getCode(); ?>_clearAddrValidation() {
+		$('<?php echo $this->getCode(); ?>_region_id').removeClassName('required-entry').removeClassName('validate-select');
+		$('<?php echo $this->getCode(); ?>_country').removeClassName('required-entry').removeClassName('validate-select');
+		$('<?php echo $this->getCode(); ?>_region').removeClassName('required-entry');
+		$('<?php echo $this->getCode(); ?>_postcode').removeClassName('required-entry');
+	}
+
+	/* Prevent the region from holding up submit... */
+	document.observe("dom:loaded", function() {
+		<?php echo $this->getCode(); ?>_clearAddrValidation();
+	});
+
+	<?php if($this->isSecureField()) :?>
+        secureForm = new EwaySecureForm(false);
+        secureForm.setupSecureField();
+    <?php endif ?>
+//]]>
+</script>

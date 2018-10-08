@@ -1,0 +1,579 @@
+<config>
+    <sections>
+        <payment>
+            <groups>
+                <ewayrapid_general translate="label" module="ewayrapid">
+                    <label>eWAY Rapid 3.1 (General settings)</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>200</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <version translate="label">
+                            <label>eWAY extension version</label>
+                            <frontend_type>select</frontend_type>
+                            <frontend_model>Eway_Rapid31_Block_Admin_Version</frontend_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </version>
+                        <active translate="label">
+                            <label>Enable this solution</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <backend_model>ewayrapid/system_config_backend_validation</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>10</sort_order>
+                        </active>
+
+                        <heading_mode translate="label">
+                            <label>eWAY Rapid 3.1 Mode</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>20</sort_order>
+                        </heading_mode>
+                        <mode translate="label">
+                            <label>Mode</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_mode</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>30</sort_order>
+                        </mode>
+                        <live_api_key translate="label">
+                            <label>Live API Key</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>40</sort_order>
+                        </live_api_key>
+                        <live_api_password translate="label">
+                            <label>Live API Password</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>50</sort_order>
+                            <comment>
+                                <![CDATA[
+                                    <a href="https://go.eway.io/s/article/How-do-I-setup-my-Live-eWAY-API-Key-and-Password" target="_blank">How to generate Live Rapid 3.1 API Key and Password</a>
+                                ]]>
+                            </comment>
+                        </live_api_password>
+                        <live_encryption_key translate="label">
+                            <label>Live Client-side Encryption Key</label>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>55</sort_order>
+                        </live_encryption_key>
+                        <live_public_api_key translate="label">
+                            <label>Live Public API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>56</sort_order>
+                        </live_public_api_key>
+                        <sandbox_api_key translate="label">
+                            <label>Sandbox API Key</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>60</sort_order>
+                        </sandbox_api_key>
+                        <sandbox_api_password translate="label">
+                            <label>Sandbox API Password</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>70</sort_order>
+                            <comment>
+                                <![CDATA[
+                                    <a href="https://go.eway.io/s/article/How-do-I-set-up-my-Sandbox-API-Key-and-password" target="_blank">How to generate Sandbox Rapid 3.1 API Key and Password</a>
+                                ]]>
+                            </comment>
+                        </sandbox_api_password>
+                        <sandbox_encryption_key translate="label">
+                            <label>Sandbox Client-side Encryption Key</label>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>75</sort_order>
+                        </sandbox_encryption_key>
+                        <sandbox_public_api_key translate="label">
+                            <label>Sandbox Public API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>76</sort_order>
+                        </sandbox_public_api_key>
+
+                        <heading_basic_settings translate="label">
+                            <label>Basic Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>80</sort_order>
+                        </heading_basic_settings>
+                        <payment_action translate="label">
+                            <label>Payment Action</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_paymentAction</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>90</sort_order>
+                        </payment_action>
+                        <connection_type translate="label">
+                            <label>Connection Type</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_connectionType</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>100</sort_order>
+                        </connection_type>
+
+                        <custom_view translate="label">
+                            <label>Shared Page Theme</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_customView</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>103</sort_order>
+                            <depends>
+                                <connection_type>sharedpage</connection_type>
+                            </depends>
+                        </custom_view>
+
+                        <beagle_verify_email translate="label">
+                            <label>Beagle Verify Email</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>101</sort_order>
+                            <depends>
+                                <connection_type>sharedpage</connection_type>
+                            </depends>
+                        </beagle_verify_email>
+
+                        <beagle_verify_phone translate="label">
+                            <label>Beagle Verify Phone</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>102</sort_order>
+                            <depends>
+                                <connection_type>sharedpage</connection_type>
+                            </depends>
+                        </beagle_verify_phone>
+                        <mask_value translate="label">
+                            <label>Mask Values</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>102</sort_order>
+                            <depends>
+                                <connection_type>securefields</connection_type>
+                            </depends>
+                        </mask_value>
+                        <auto_complete translate="label">
+                            <label>Auto Complete</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>102</sort_order>
+                            <depends>
+                                <connection_type>securefields</connection_type>
+                            </depends>
+                        </auto_complete>
+
+                        <enable_masterpass translate="label">
+                            <label>Enable MasterPass</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>104</sort_order>
+                            <depends>
+                                <connection_type>transparent</connection_type>
+                            </depends>
+                        </enable_masterpass>
+                        <enable_paypal_standard translate="label">
+                            <label>Enable PayPal</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>105</sort_order>
+                            <depends>
+                                <connection_type>transparent</connection_type>
+                            </depends>
+                        </enable_paypal_standard>
+                        <enable_visa_checkout translate="label">
+                            <label>Enable Visa Checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>106</sort_order>
+                            <depends>
+                                <connection_type>transparent</connection_type>
+                            </depends>
+                        </enable_visa_checkout>
+                        <visa_checkout_api_key translate="label">
+                            <label>Visa Checkout Api Key</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>107</sort_order>
+                            <depends>
+                                <connection_type>transparent</connection_type>
+                            </depends>
+                        </visa_checkout_api_key>
+                        <!--<enable_paypal_checkout translate="label">-->
+                        <!--<label>Enable PayPal Express Checkout</label>-->
+                        <!--<frontend_type>select</frontend_type>-->
+                        <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
+                        <!--<show_in_default>1</show_in_default>-->
+                        <!--<show_in_website>1</show_in_website>-->
+                        <!--<sort_order>104</sort_order>-->
+                        <!--<depends>-->
+                        <!--<connection_type>transparent</connection_type>-->
+                        <!--</depends>-->
+                        <!--<comment>-->
+                        <!--<![CDATA[-->
+                        <!--<span style="color:red;font-weight:bold">Caution</span>: If you enable PayPal or MasterPass, you must also setup the connection in MYeWAY-->
+                        <!--]]>-->
+                        <!--</comment>-->
+                        <!--</enable_paypal_checkout>-->
+                        <store_in_paypal translate="label">
+                            <label>Store Transaction in PayPal</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>106</sort_order>
+                            <depends>
+                                <connection_type>transparent</connection_type>
+                            </depends>
+                        </store_in_paypal>
+
+                        <heading_customer_settings translate="label">
+                            <label>Customer Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>110</sort_order>
+                        </heading_customer_settings>
+                        <can_edit_token translate="label">
+                            <label>Customer can edit token</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>120</sort_order>
+                        </can_edit_token>
+                        <can_cancel_subscriptions translate="label">
+                            <label>Customer can cancel subscriptions</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>130</sort_order>
+                        </can_cancel_subscriptions>
+                        <block_fraud_customers translate="label">
+                            <label>Block Fraud customers</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <comment>
+                                <![CDATA[
+                                    If yes, customers who place a Suspected Fraud order will be blocked from
+                                    placing a new order until the earlier order is accepted.
+                                ]]>
+                            </comment>
+                            <sort_order>140</sort_order>
+                        </block_fraud_customers>
+
+                        <verify_eway_order translate="label">
+                            <label>Verify Order</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_verifyStatus</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <comment>
+                                <![CDATA[
+                                    The status of an approved "Suspect Fraud" order
+                                ]]>
+                            </comment>
+                            <sort_order>140</sort_order>
+                        </verify_eway_order>
+
+                        <heading_advanced_settings translate="label">
+                            <label>Advanced Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>150</sort_order>
+                        </heading_advanced_settings>
+                        <useccv translate="label">
+                            <label>Require CVN</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>160</sort_order>
+                            <comment>
+                                <![CDATA[
+                                    eWAY strongly recommends enabling CVN to help prevent fraud. Many banks require it.
+                                ]]>
+                            </comment>
+                        </useccv>
+                        <cctypes translate="label">
+                            <label>Accepted Credit Cards</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>ewayrapid/system_config_source_cctype</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>170</sort_order>
+                            <comment>
+                                <![CDATA[
+                                    Visa Electron and Maestro are accepted in the UK only.
+                                ]]>
+                            </comment>
+                        </cctypes>
+                        <allowspecific translate="label">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>175</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>176</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                        </specificcountry>
+                        <order_status translate="label">
+                            <label>New Order Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_orderstatus</source_model>
+                            <backend_model>ewayrapid/system_config_backend_orderstatus</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>180</sort_order>
+                            <comment>
+                                <![CDATA[
+                                If you have changed Payment Action, please save the config before updating this field.
+                                ]]>
+                            </comment>
+                        </order_status>
+                        <ssl_verification translate="label">
+                            <label>Enable SSL Verification</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>190</sort_order>
+                            <comment>
+                                <![CDATA[
+                                SSL Verification is always on in Live mode, regardless of this setting.
+                                ]]>
+                            </comment>
+                        </ssl_verification>
+                        <transfer_cart_items translate="label">
+                            <label>Transfer Cart Line Items</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>200</sort_order>
+                        </transfer_cart_items>
+
+                        <invoice_description translate="label">
+                            <label>Invoice Description</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_noYes</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>201</sort_order>
+                        </invoice_description>
+
+                        <guess_order translate="label">
+                            <label>Guess next order #</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ewayrapid/system_config_source_noYes</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>202</sort_order>
+                        </guess_order>
+
+                        <debug translate="label">
+                            <label>Debug</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>230</sort_order>
+                        </debug>
+                    </fields>
+                </ewayrapid_general>
+                <!--<ewayrapid_notsaved>-->
+                    <!--<label>eWAY Rapid 3.1 (Not Saved)</label>-->
+                    <!--<frontend_type>text</frontend_type>-->
+                    <!--<sort_order>201</sort_order>-->
+                    <!--<show_in_default>1</show_in_default>-->
+                    <!--<show_in_website>1</show_in_website>-->
+                    <!--<show_in_store>1</show_in_store>-->
+                    <!--<fields>-->
+                        <!--<active>-->
+                            <!--<label>Enabled</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<sort_order>10</sort_order>-->
+                        <!--</active>-->
+                        <!--<title>-->
+                            <!--<label>Title</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<sort_order>20</sort_order>-->
+                        <!--</title>-->
+                        <!--<sort_order>-->
+                            <!--<label>Sort Order</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<sort_order>30</sort_order>-->
+                        <!--</sort_order>-->
+                    <!--</fields>-->
+                <!--</ewayrapid_notsaved>-->
+                <ewayrapid_ewayone>
+                    <label>eWAY Rapid 3.1</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>201</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active>
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>10</sort_order>
+                        </active>
+                        <title>
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>20</sort_order>
+                        </title>
+                        <save_card>
+                            <label>Save Card</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>30</sort_order>
+                        </save_card>
+                        <save_text>
+                        <label>Save Card Label</label>
+                        <frontend_type>text</frontend_type>
+                        <show_in_default>1</show_in_default>
+                        <show_in_website>1</show_in_website>
+                        <show_in_store>1</show_in_store>
+                        <sort_order>40</sort_order>
+                    </save_text>
+                        <save_card_checked>
+                            <label>Default check</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>50</sort_order>
+                        </save_card_checked>
+                        <sort_order>
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <sort_order>30</sort_order>
+                        </sort_order>
+                    </fields>
+
+                </ewayrapid_ewayone>
+                <!--<ewayrapid_saved>-->
+                    <!--<label>eWAY Rapid 3.1 (Saved)</label>-->
+                    <!--<frontend_type>text</frontend_type>-->
+                    <!--<sort_order>202</sort_order>-->
+                    <!--<show_in_default>1</show_in_default>-->
+                    <!--<show_in_website>1</show_in_website>-->
+                    <!--<show_in_store>1</show_in_store>-->
+                    <!--<fields>-->
+                        <!--<active>-->
+                            <!--<label>Enabled</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<sort_order>10</sort_order>-->
+                            <!--<comment>-->
+                                <!--<![CDATA[-->
+                                <!--eWAY Rapid 3.1 (Saved) will only display to logged in customers-->
+                                <!--]]>-->
+                            <!--</comment>-->
+                        <!--</active>-->
+                        <!--<title>-->
+                            <!--<label>Title</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<sort_order>20</sort_order>-->
+                        <!--</title>-->
+                        <!--<sort_order>-->
+                            <!--<label>Sort Order</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<sort_order>30</sort_order>-->
+                        <!--</sort_order>-->
+                    <!--</fields>-->
+                <!--</ewayrapid_saved>-->
+            </groups>
+        </payment>
+    </sections>
+</config>
